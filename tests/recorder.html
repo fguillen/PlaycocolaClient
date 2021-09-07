@@ -6,7 +6,7 @@
     <title>
         Recorder v2.2
     </title>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
 </head>
@@ -39,7 +39,7 @@
 
       <div class="p-5">
           XXX
-          <video autoplay height='480' width="640" muted></video>
+          <video autoplay height="480" width="640" muted></video>
       </div>
     </div>
 </body>
@@ -47,32 +47,28 @@
     let shouldStop = false;
     let stopped = false;
     const videoElement = document.getElementsByTagName("video")[0];
-    const linkDownload = document.getElementById('link-download');
-    const buttonStop = document.getElementById('button-stop');
-    const buttonRecord = document.getElementById('button-record');
-    const checkMic = document.getElementById('check-mic');
+    const linkDownload = document.getElementById("link-download");
+    const buttonStop = document.getElementById("button-stop");
+    const buttonRecord = document.getElementById("button-record");
+    const checkMic = document.getElementById("check-mic");
 
     function startRecord() {
       buttonRecord.disabled = true;
       buttonStop.disabled = false;
       linkDownload.style.display = "none";
-        // $('.btn-info').prop('disabled', true);
-        // $('#stop').prop('disabled', false);
-        // $('#download').css('display', 'none')
     }
+
     function stopRecord() {
       buttonRecord.disabled = false;
       buttonStop.disabled = true;
       linkDownload.style.display = "block";
-        // $('.btn-info').prop('disabled', false);
-        // $('#stop').prop('disabled', true);
-        // $('#download').css('display', 'block')
     }
+
     const audioRecordConstraints = {
         echoCancellation: true
     }
 
-    buttonStop.addEventListener('click', function () {
+    buttonStop.addEventListener("click", function () {
         shouldStop = true;
     });
 
@@ -100,7 +96,7 @@
             recordedChunks = [];
             const filename = "MySuperGame_testrecording_" + Date.now();
             linkDownload.href = URL.createObjectURL(blob);
-            linkDownload.download = `${filename || 'recording'}.webm`;
+            linkDownload.download = `${filename || "recording"}.webm`;
             stopRecord();
             videoElement.srcObject = null;
         };
@@ -109,22 +105,22 @@
     };
 
     async function recordScreen() {
-        const mimeType = 'video/webm';
+        const mimeType = "video/webm";
         shouldStop = false;
         const constraints = {
             video: {
-                cursor: 'motion'
+                cursor: "motion"
             }
         };
         if(!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)) {
-            return window.alert('Screen Record not supported!')
+            return window.alert("Screen Record not supported!")
         }
         let stream = null;
-        const displayStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {'echoCancellation': true}});
+        const displayStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": true}});
         if(window.confirm("Record audio with screen?")){
             const audioContext = new AudioContext();
 
-            const voiceStream = await navigator.mediaDevices.getUserMedia({ audio: {'echoCancellation': true}, video: false });
+            const voiceStream = await navigator.mediaDevices.getUserMedia({ audio: {"echoCancellation": true}, video: false });
             const userAudio = audioContext.createMediaStreamSource(voiceStream);
 
             const audioDestination = audioContext.createMediaStreamDestination();
