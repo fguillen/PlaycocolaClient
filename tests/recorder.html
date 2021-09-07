@@ -33,7 +33,7 @@
 
         <div class="form-check">
           <input type="checkbox" class="form-check-input" id="check-mic">
-          <label class="form-check-label" for="check-mic">Record speak loud</label>
+          <label class="form-check-label" for="check-mic">Record Sound</label>
         </div>
       </form>
 
@@ -91,63 +91,65 @@
         };
 
         mediaRecorder.onstop = function () {
-            const blob = new Blob(recordedChunks, {
-                type: mimeType
-            });
-            recordedChunks = [];
-            const filename = "MySuperGame_testrecording_" + Date.now();
-            let videoUrl = URL.createObjectURL(blob);
-            linkDownload.href = videoUrl;
-            linkDownload.download = `${filename || "recording"}.webm`;
-            stopRecord();
+          const blob = new Blob(recordedChunks, {
+              type: mimeType
+          });
+          recordedChunks = [];
+          const filename = "MySuperGame_testrecording_" + Date.now();
+          let videoUrl = URL.createObjectURL(blob);
+          linkDownload.href = videoUrl;
+          linkDownload.download = `${filename || "recording"}.webm`;
+          stopRecord();
 
-            videoElement.srcObject = null;
-            videoElement.src = videoUrl;
-            videoElement.load();
-            videoElement.onloadeddata = function() {
-              console.log("video.onloadeddata()");
-              videoElement.controls = true;
-              videoElement.play();
-            }
+          videoElement.srcObject = null;
+          videoElement.src = videoUrl;
+          videoElement.load();
+          videoElement.onloadeddata = function() {
+            console.log("video.onloadeddata()");
+            videoElement.controls = true;
+            videoElement.play();
+          }
         };
 
         mediaRecorder.start(200);
     };
 
     async function recordScreen() {
-        const mimeType = "video/webm";
         shouldStop = false;
+
+        const mimeType = "video/webm";
         const constraints = {
-            video: {
-                cursor: "motion"
-            }
+          video: {
+            cursor: "motion"
+          }
         };
+
         if(!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia)) {
-            return window.alert("Screen Record not supported!")
+          return window.alert("Screen Record not supported!")
         }
-        let stream = null;
+
+        const audioContext = new AudioContext();
+        const audioDestination = audioContext.createMediaStreamDestination();
+
         const displayStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": true}});
-        if(checkMic.checked){
-            const audioContext = new AudioContext();
-
-            const voiceStream = await navigator.mediaDevices.getUserMedia({ audio: {"echoCancellation": true}, video: false });
-            const userAudio = audioContext.createMediaStreamSource(voiceStream);
-
-            const audioDestination = audioContext.createMediaStreamDestination();
-            userAudio.connect(audioDestination);
-
-            if(displayStream.getAudioTracks().length > 0) {
-                const displayAudio = audioContext.createMediaStreamSource(displayStream);
-                displayAudio.connect(audioDestination);
-            }
-
-            const tracks = [...displayStream.getVideoTracks(), ...audioDestination.stream.getTracks()]
-            stream = new MediaStream(tracks);
-            handleRecord({stream, mimeType})
+        if(displayStream.getAudioTracks().length > 0) {
+          const displayAudio = audioContext.createMediaStreamSource(displayStream);
+          displayAudio.connect(audioDestination);
         } else {
-            stream = displayStream;
-            handleRecord({stream, mimeType});
-        };
+          console.error("displayStream.getAudioTracks().length is 0");
+        }
+
+        if(checkMic.checked){
+          const voiceStream = await navigator.mediaDevices.getUserMedia({ audio: {"echoCancellation": true}, video: false });
+          const userAudio = audioContext.createMediaStreamSource(voiceStream);
+          userAudio.connect(audioDestination);
+        }
+
+        const tracks = [...displayStream.getVideoTracks(), ...audioDestination.stream.getTracks()]
+        const stream = new MediaStream(tracks);
+
+        handleRecord({stream, mimeType})
+
         videoElement.srcObject = stream;
     }
 </script>
