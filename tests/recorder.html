@@ -46,6 +46,7 @@
 <script>
     let shouldStop = false;
     let stopped = false;
+
     const videoElement = document.getElementsByTagName("video")[0];
     const linkDownload = document.getElementById("link-download");
     const buttonStop = document.getElementById("button-stop");
@@ -95,10 +96,19 @@
             });
             recordedChunks = [];
             const filename = "MySuperGame_testrecording_" + Date.now();
-            linkDownload.href = URL.createObjectURL(blob);
+            let videoUrl = URL.createObjectURL(blob);
+            linkDownload.href = videoUrl;
             linkDownload.download = `${filename || "recording"}.webm`;
             stopRecord();
+
             videoElement.srcObject = null;
+            videoElement.src = videoUrl;
+            videoElement.load();
+            videoElement.onloadeddata = function() {
+              console.log("video.onloadeddata()");
+              videoElement.controls = true;
+              videoElement.play();
+            }
         };
 
         mediaRecorder.start(200);
@@ -117,7 +127,7 @@
         }
         let stream = null;
         const displayStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": true}});
-        if(window.confirm("Record audio with screen?")){
+        if(checkMic.checked){
             const audioContext = new AudioContext();
 
             const voiceStream = await navigator.mediaDevices.getUserMedia({ audio: {"echoCancellation": true}, video: false });
