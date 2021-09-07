@@ -79,13 +79,6 @@
         mediaRecorder.start(200);
     };
 
-    async function recordAudio() {
-        const mimeType = 'audio/webm';
-        shouldStop = false;
-        const stream = await navigator.mediaDevices.getUserMedia({audio: audioRecordConstraints});
-        handleRecord({stream, mimeType})
-    }
-
     async function recordScreen() {
         const mimeType = 'video/webm';
         shouldStop = false;
