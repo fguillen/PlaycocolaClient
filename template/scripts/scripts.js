@@ -83,6 +83,8 @@ function finalBlob(blob) {
     videoElement.controls = true;
     videoElement.play();
   }
+
+  uploadFile(blob);
 }
 
 function getSeekableBlob(inputBlob, callback) {
@@ -147,4 +149,32 @@ async function recordScreen() {
     handleRecord({stream, mimeType})
 
     videoElement.srcObject = stream;
+}
+
+async function uploadFile(blob) {
+  let test_session = { comment: "SUPER GOOD COMMENT", time_in_minutes: 23, video: blob };
+  let formData = new FormData();
+  formData.append("test_session", test_session);
+
+  try {
+    console.log("Start uploading");
+
+    let response =
+      await fetch(
+        'http://localhost:3000/front/test_sessions',
+        {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "multipart/form-data"
+          },
+          body: formData
+        }
+      );
+
+    console.log("HTTP response:", response);
+    console.log("HTTP response code:", response.status);
+  } catch(e) {
+    console.log("Huston we have problem...:", e);
+  }
 }
