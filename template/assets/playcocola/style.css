@@ -1,0 +1,120 @@
+#mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedSubmit button.primary {
+  color: #fff;
+  border: none;
+  height: 75px;
+  width: 200px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: "Poppins";
+  background: linear-gradient( -36deg, #b16fff 0%, #e980ff 100%);
+}
+
+#mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedSubmit button.primary {
+  border-bottom-left-radius: 4px!important;
+  border-bottom-right-radius: 4px!important;
+  border-top-left-radius: 0px!important;
+  border-top-right-radius: 0px!important;
+}
+
+#mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper.embedForm {
+  max-width: 1400px !important;
+}
+
+.ml-form-embedPermissions {
+  display: none;
+}
+
+#mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody, #mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper .ml-form-successBody {
+  padding: 0px !important;
+}
+
+#mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedContent, #mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper .ml-form-successBody .ml-form-successContent {
+  margin: 20px !important;
+}
+
+#mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-checkboxRow, #mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-formContent {
+    padding: 0px 20px;
+}
+
+#mlb2-4717853.ml-form-embedContainer .ml-form-embedWrapper .ml-form-embedBody .ml-form-embedSubmit {
+  margin: 0 !important;
+}
+
+.app-edu-sticky-on {
+  background-image: linear-gradient(90deg , #ac281f 0%, #ba4f54 50%, #e09dbb 100%);
+}
+
+@media screen and (max-width: 991px) {
+  .app-edu-footer-section {
+      background-image: linear-gradient(90deg , #ac281f 0%, #ba4f54 50%, #e09dbb 100%) !important;
+  }
+}
+
+/* The button */
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn {
+  padding: 45px 0px 25px 0px;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice {
+  font-size: 38px;
+  font-weight: 700;
+  font-family: "Poppins";
+  display: inline-block;
+  transition: 0.3s all ease-in-out;
+  border-style: none;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice {
+  height: 131px;
+  color: #fff;
+  width: 421px;
+  line-height: 129px;
+  text-align: center;
+  border-radius: 50px;
+  margin-right: 20px;
+  border-top-right-radius: 0;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice i {
+  top: 3px;
+  color: #000;
+  font-size: 38px;
+  position: relative;
+  margin-right: 10px;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice:hover {
+  border-top-right-radius: 50px;
+  border-bottom-left-radius: 0px;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice.color-1 {
+  background-color: #ff00d6;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice.color-1:hover {
+  background-color: #009cff;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice.color-2 {
+  background-color: #009cff;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice.color-2:hover {
+  background-color: #ff00d6;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice.color-3 {
+  background-color: #009cff;
+}
+
+.button-section .eight-banner-content .banner-content-box .ei-banner-btn .button-nice.color-3:hover {
+  background-color: #ff00d6;
+}
+
+
+#video {
+  box-shadow: 11px 3px 12px 3px rgba(215,28,166,0.35);
+-webkit-box-shadow: 11px 3px 12px 3px rgba(215,28,166,0.35);
+-moz-box-shadow: 11px 3px 12px 3px rgba(215,28,166,0.35);
+}
