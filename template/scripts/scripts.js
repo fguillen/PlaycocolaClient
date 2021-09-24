@@ -73,15 +73,18 @@ const handleRecord = function ({stream, mimeType}) {
         videoElement.controls = true;
         videoElement.play();
       }
+
+      // Stop tracks, remove the red icon
+      stream.getTracks().forEach( track => track.stop() );
     };
 
     mediaRecorder.start(200);
 };
 
 async function recordScreen() {
-    shouldStop = false;
+    App.shouldStop = false;
 
-    const mimeType = "video/webm";
+    const mimeType = "video/webm;codecs=vp9";
     const constraints = {
       video: {
         cursor: "motion"
