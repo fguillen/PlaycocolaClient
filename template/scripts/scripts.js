@@ -58,28 +58,57 @@ const handleRecord = function ({stream, mimeType}) {
       const blob = new Blob(recordedChunks, {
           type: mimeType
       });
-      recordedChunks = [];
-      const filename = "MySuperGame_testrecording_" + Date.now();
-      let videoUrl = URL.createObjectURL(blob);
-      linkDownload.href = videoUrl;
-      linkDownload.download = `${filename || "recording"}.webm`;
       stopRecord();
+      recordedChunks = [];
 
-      videoElement.srcObject = null;
-      videoElement.src = videoUrl;
-      videoElement.load();
-      videoElement.onloadeddata = function() {
-        console.log("video.onloadeddata()");
-        videoElement.controls = true;
-        videoElement.play();
-      }
-
+      getSeekableBlob(blob, finalBlob)
       // Stop tracks, remove the red icon
       stream.getTracks().forEach( track => track.stop() );
     };
 
     mediaRecorder.start(200);
 };
+
+function finalBlob(blob) {
+  const filename = "MySuperGame_testrecording_" + Date.now();
+  let videoUrl = URL.createObjectURL(blob);
+  linkDownload.href = videoUrl;
+  linkDownload.download = `${filename || "recording"}.webm`;
+
+  videoElement.srcObject = null;
+  videoElement.src = videoUrl;
+  videoElement.load();
+  videoElement.onloadeddata = function() {
+    console.log("video.onloadeddata()");
+    videoElement.controls = true;
+    videoElement.play();
+  }
+}
+
+function getSeekableBlob(inputBlob, callback) {
+  // EBML.js copyrights goes to: https://github.com/legokichi/ts-ebml
+  if (typeof EBML === 'undefined') {
+      throw new Error('Please link: https://cdn.webrtc-experiment.com/EBML.js');
+  }
+  var reader = new EBML.Reader();
+  var decoder = new EBML.Decoder();
+  var tools = EBML.tools;
+  var fileReader = new FileReader();
+  fileReader.onload = function(e) {
+      var ebmlElms = decoder.decode(this.result);
+      ebmlElms.forEach(function(element) {
+          reader.read(element);
+      });
+      reader.stop();
+      var refinedMetadataBuf = tools.makeMetadataSeekable(reader.metadatas, reader.duration, reader.cues);
+      var body = this.result.slice(reader.metadataSize);
+      var newBlob = new Blob([refinedMetadataBuf, body], {
+          type: 'video/webm'
+      });
+      callback(newBlob);
+  };
+  fileReader.readAsArrayBuffer(inputBlob);
+}
 
 async function recordScreen() {
     App.shouldStop = false;
