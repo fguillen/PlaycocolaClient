@@ -152,9 +152,10 @@ async function recordScreen() {
 }
 
 async function uploadFile(blob) {
-  let test_session = { comment: "SUPER GOOD COMMENT", time_in_minutes: 23, video: blob };
   let formData = new FormData();
-  formData.append("test_session", test_session);
+  formData.append("test_session[comment]", "SUPER GOOD COMMENT");
+  formData.append("test_session[time_in_minutes]", 10);
+  formData.append("test_session[video]", blob);
 
   try {
     console.log("Start uploading");
@@ -164,10 +165,10 @@ async function uploadFile(blob) {
         'http://localhost:3000/front/test_sessions',
         {
           method: "POST",
-          headers: {
-            "Accept": "application/json",
-            "Content-Type": "multipart/form-data"
-          },
+          // headers: {
+          //   "Accept": "application/json",
+          //   "Content-Type": "multipart/form-data"
+          // },
           body: formData
         }
       );
