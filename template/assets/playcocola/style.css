@@ -118,3 +118,9 @@
 -webkit-box-shadow: 11px 3px 12px 3px rgba(215,28,166,0.35);
 -moz-box-shadow: 11px 3px 12px 3px rgba(215,28,166,0.35);
 }
+
+
+#upload-progress {
+  font-family: "Poppins";
+  font-weight: bold;
+}

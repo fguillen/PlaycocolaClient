@@ -7,11 +7,15 @@ const videoElement = document.getElementById("video");
 const linkDownload = document.getElementById("link-download");
 const buttonRecord = document.getElementById("button-record");
 const buttonStop = document.getElementById("button-stop");
+const progressBarDiv = document.getElementById("upload-progress");
 const recordSound = true;
 
 buttonStop.style.display = "none";
 videoElement.style.display = "none";
 linkDownload.style.display = "none";
+progressBarDiv.style.display = "none";
+uploadProgressBarUpdate(0);
+
 
 function startRecord() {
   buttonRecord.disabled = true;
@@ -22,7 +26,12 @@ function startRecord() {
 
 function stopRecord() {
   buttonStop.style.display = "none";
+  progressBarDiv.style.display = "block";
+}
+
+function uploadFinished() {
   linkDownload.style.display = "inline-block";
+  progressBarDiv.style.display = "none";
 }
 
 const audioRecordConstraints = {
@@ -161,21 +170,26 @@ async function uploadFile(blob) {
     console.log("Start uploading");
 
     let response =
-      await fetch(
-        'http://localhost:3000/front/test_sessions',
-        {
-          method: "POST",
-          // headers: {
-          //   "Accept": "application/json",
-          //   "Content-Type": "multipart/form-data"
-          // },
-          body: formData
+      await axios.request({
+        method: "post",
+        url: "http://localhost:3000/front/test_sessions",
+        data: formData,
+        onUploadProgress: (p) => {
+          console.log("progress: ", p);
+          uploadProgressBarUpdate(p.loaded / p.total);
         }
-      );
+      });
 
     console.log("HTTP response:", response);
     console.log("HTTP response code:", response.status);
+    uploadFinished();
   } catch(e) {
     console.log("Huston we have problem...:", e);
   }
+}
+
+function uploadProgressBarUpdate(percentage) {
+  const bar = progressBarDiv.querySelector(".progress-bar");
+  bar.setAttribute("aria-valuenow", percentage * 100);
+  bar.style.width = (percentage * 100) + "%";
 }

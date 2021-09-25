@@ -114,6 +114,13 @@
                         <button class="button-nice color-1" id="button-record"><i class="fas fa-power-off"></i> Start Recording</button>
                         <button class="button-nice color-2" id="button-stop"><i class="far fa-stop-circle"></i> Stop Recording</button>
                         <a class="button-nice color-3" id="link-download"><i class="fas fa-cloud-download-alt"></i> Download</a>
+
+                        <div id="upload-progress">
+                          <div class="progress" style="height: 30px; width: 80%; margin: auto">
+                            <div class="progress-bar appeared progress-bar-striped progress-bar-animated" role="progressbar" style="width: 50%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">Uploading</div>
+                          </div>
+                        </div>
+
                       </div>
 
                       <div class="">
@@ -328,6 +335,7 @@
         <!-- <script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
         <script src="scripts/scripts_2.js"></script> -->
 
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- for upload with progress event -->
         <script src="https://cdn.webrtc-experiment.com/EBML.js"></script>
         <script src="scripts/scripts.js"></script>
     </body>
