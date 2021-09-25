@@ -162,9 +162,9 @@ async function recordScreen() {
 
 async function uploadFile(blob) {
   let formData = new FormData();
-  formData.append("test_session[comment]", "SUPER GOOD COMMENT");
-  formData.append("test_session[time_in_minutes]", 10);
-  formData.append("test_session[video]", blob);
+  formData.append("play_session[comment]", "SUPER GOOD COMMENT");
+  formData.append("play_session[time_in_minutes]", 10);
+  formData.append("play_session[video]", blob);
 
   try {
     console.log("Start uploading");
@@ -172,8 +172,9 @@ async function uploadFile(blob) {
     let response =
       await axios.request({
         method: "post",
-        url: "http://localhost:3000/front/test_sessions",
+        url: "http://localhost:3000/api/front/play_sessions",
         data: formData,
+        headers: { "Authorization": "Playcocola FRONT_TOKEN" },
         onUploadProgress: (p) => {
           console.log("progress: ", p);
           uploadProgressBarUpdate(p.loaded / p.total);
