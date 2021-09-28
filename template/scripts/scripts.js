@@ -8,6 +8,9 @@ const linkDownload = document.getElementById("link-download");
 const buttonRecord = document.getElementById("button-record");
 const buttonStop = document.getElementById("button-stop");
 const progressBarDiv = document.getElementById("upload-progress");
+const playGatheringTitle = document.getElementById("play-gathering-title");
+const playGatheringDescription = document.getElementById("play-gathering-description");
+
 const recordSound = true;
 
 buttonStop.style.display = "none";
@@ -96,6 +99,30 @@ function finalBlob(blob) {
   uploadFile(blob);
 }
 
+// From: https://stackoverflow.com/a/43378874/316700
+function getParam(param){
+  return new URLSearchParams(window.location.search).get(param);
+}
+
+async function getPlaySessionInfo() {
+  const play_gathering_uuid = getParam("play_gathering_uuid");
+
+  let response =
+    await axios.request({
+      method: "get",
+      url: "http://localhost:3000/api/front/play_gatherings/" + play_gathering_uuid,
+      headers: { "Authorization": "Playcocola FRONT_TOKEN" }
+    });
+
+  showPlaySessionInfo(response.data);
+}
+
+function showPlaySessionInfo(info) {
+  console.log("showPlaySessionInfo", info);
+  playGatheringTitle.textContent = info.title;
+  playGatheringDescription.textContent = info.description;
+}
+
 function getSeekableBlob(inputBlob, callback) {
   // EBML.js copyrights goes to: https://github.com/legokichi/ts-ebml
   if (typeof EBML === 'undefined') {
@@ -161,6 +188,8 @@ async function recordScreen() {
 }
 
 async function uploadFile(blob) {
+  const play_gathering_uuid = getParam("play_gathering_uuid");
+
   let formData = new FormData();
   formData.append("play_session[comment]", "SUPER GOOD COMMENT");
   formData.append("play_session[time_in_minutes]", 10);
@@ -172,7 +201,7 @@ async function uploadFile(blob) {
     let response =
       await axios.request({
         method: "post",
-        url: "http://localhost:3000/api/front/play_sessions",
+        url: "http://localhost:3000/api/front/play_gatherings/" + play_gathering_uuid + "/play_sessions",
         data: formData,
         headers: { "Authorization": "Playcocola FRONT_TOKEN" },
         onUploadProgress: (p) => {
@@ -194,3 +223,7 @@ function uploadProgressBarUpdate(percentage) {
   bar.setAttribute("aria-valuenow", percentage * 100);
   bar.style.width = (percentage * 100) + "%";
 }
+
+
+// Start
+getPlaySessionInfo();
