@@ -137,6 +137,7 @@
 
 #sa-contact-inner {
   background-color: #0F0034;
+  padding-bottom: 0px;
 }
 
 .sa-contact-inner-form {
@@ -145,4 +146,20 @@
 
 #sa-contact-inner > div > div.saas_two_section_title.saas2-headline.text-center > p {
   color: white;
+}
+
+.feature-eight-section .eight-feature-box .feature-icon8 .ei-icon-bg {
+  border-radius: 21px;
+}
+
+.feature-eight-section .eight-feature-box .ei-feature-more {
+  opacity: 0.8;
+  bottom: -25px;
+  visibility: visible;
+}
+
+.feature-eight-section .eight-feature-box:hover .ei-feature-more {
+  opacity: 1;
+  bottom: -15px;
+  visibility: visible;
 }

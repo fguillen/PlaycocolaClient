@@ -14,9 +14,9 @@ const buttonStop = document.getElementById("button-stop");
 const progressBarDiv = document.getElementById("upload-progress");
 const playGatheringTitle = document.getElementById("play-gathering-title");
 const playGatheringDescription = document.getElementById("play-gathering-description");
-
 const thoughtsFormDiv = document.getElementById("sa-contact-inner");
 const thoughtsForm = document.getElementById("thoughts-form");
+const thanksDiv = document.getElementById("thanks-div");
 
 const recordSound = true;
 
@@ -26,9 +26,7 @@ videoElement.style.display = "none";
 linkDownload.style.display = "none";
 progressBarDiv.style.display = "none";
 thoughtsFormDiv.style.display = "none";
-
-
-
+thanksDiv.style.display = "none";
 
 
 function startRecord() {
@@ -45,8 +43,9 @@ function stopRecord() {
 }
 
 function uploadFinished(_playSessionUUID) {
-  linkDownload.style.display = "inline-block";
+  // linkDownload.style.display = "inline-block";
   progressBarDiv.style.display = "none";
+  thanksDiv.style.display = "block";
   uploadIsFinished = true;
   playSessionUUID = _playSessionUUID;
 
@@ -293,6 +292,10 @@ async function thoughtsFormSend() {
   } catch(e) {
     console.log("Huston we have problem...:", e);
   }
+}
+
+function refreshPage() {
+  location.reload();
 }
 
 
