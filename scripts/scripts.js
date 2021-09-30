@@ -105,12 +105,12 @@ function getParam(param){
 }
 
 async function getPlaySessionInfo() {
-  const play_gathering_uuid = getParam("play_gathering_uuid");
+  const play_gathering_api_url = getParam("play_gathering_api_url");
 
   let response =
     await axios.request({
       method: "get",
-      url: "http://localhost:3000/api/front/play_gatherings/" + play_gathering_uuid,
+      url: play_gathering_api_url,
       headers: { "Authorization": "Playcocola FRONT_TOKEN" }
     });
 
@@ -188,7 +188,7 @@ async function recordScreen() {
 }
 
 async function uploadFile(blob) {
-  const play_gathering_uuid = getParam("play_gathering_uuid");
+  const play_gathering_api_url = getParam("play_gathering_api_url");
 
   let formData = new FormData();
   formData.append("play_session[comment]", "SUPER GOOD COMMENT");
@@ -201,7 +201,7 @@ async function uploadFile(blob) {
     let response =
       await axios.request({
         method: "post",
-        url: "http://localhost:3000/api/front/play_gatherings/" + play_gathering_uuid + "/play_sessions",
+        url: play_gathering_api_url + "/play_sessions",
         data: formData,
         headers: { "Authorization": "Playcocola FRONT_TOKEN" },
         onUploadProgress: (p) => {
