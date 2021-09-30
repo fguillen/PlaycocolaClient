@@ -127,12 +127,13 @@ function getParam(param){
 
 async function getPlaySessionInfo() {
   const play_gathering_api_url = getParam("play_gathering_api_url");
+  const api_token = getParam("api_token");
 
   let response =
     await axios.request({
       method: "get",
       url: play_gathering_api_url,
-      headers: { "Authorization": "Playcocola FRONT_TOKEN" }
+      headers: { "Authorization": "Playcocola " + api_token }
     });
 
   showPlaySessionInfo(response.data);
@@ -217,6 +218,7 @@ async function recordScreen() {
 
 async function uploadFile(blob) {
   const play_gathering_api_url = getParam("play_gathering_api_url");
+  const api_token = getParam("api_token");
 
   let formData = new FormData();
   formData.append("play_session[time_in_minutes]", blob.duration);
@@ -230,7 +232,7 @@ async function uploadFile(blob) {
         method: "post",
         url: play_gathering_api_url + "/play_sessions",
         data: formData,
-        headers: { "Authorization": "Playcocola FRONT_TOKEN" },
+        headers: { "Authorization": "Playcocola " + api_token },
         onUploadProgress: (p) => {
           console.log("progress: ", p);
           uploadProgressBarUpdate(p.loaded / p.total);
@@ -269,6 +271,7 @@ function thoughtsFormReady() {
 
 async function thoughtsFormSend() {
   const play_gathering_api_url = getParam("play_gathering_api_url");
+  const api_token = getParam("api_token");
 
   let formData = new FormData();
   formData.append("play_session[user_name]", thoughtsForm.querySelector('[name="name"]').value );
@@ -283,7 +286,7 @@ async function thoughtsFormSend() {
         method: "put",
         url: play_gathering_api_url + "/play_sessions/" + playSessionUUID,
         data: formData,
-        headers: { "Authorization": "Playcocola FRONT_TOKEN" }
+        headers: { "Authorization": "Playcocola " + api_token }
       });
 
     console.log("HTTP response:", response);
