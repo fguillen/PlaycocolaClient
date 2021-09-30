@@ -13,6 +13,7 @@ const playGatheringDescription = document.getElementById("play-gathering-descrip
 
 const recordSound = true;
 
+buttonRecord.style.display = "none";
 buttonStop.style.display = "none";
 videoElement.style.display = "none";
 linkDownload.style.display = "none";
@@ -115,12 +116,19 @@ async function getPlaySessionInfo() {
     });
 
   showPlaySessionInfo(response.data);
+
+  buttonRecord.style.display = "inline-block";
+}
+
+function makeAllLinksTargetBlank(element) {
+  element.querySelectorAll("a").forEach( link => link.setAttribute('target', '_blank') );
 }
 
 function showPlaySessionInfo(info) {
   console.log("showPlaySessionInfo", info);
   playGatheringTitle.textContent = info.title;
-  playGatheringDescription.textContent = info.description;
+  playGatheringDescription.innerHTML = marked(info.description);
+  makeAllLinksTargetBlank(playGatheringDescription);
 }
 
 function getSeekableBlob(inputBlob, callback) {

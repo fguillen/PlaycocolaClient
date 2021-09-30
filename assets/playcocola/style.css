@@ -124,3 +124,13 @@
   font-family: "Poppins";
   font-weight: bold;
 }
+
+
+#play-gathering-description p {
+  font-size: 24px;
+  margin-bottom: 1em;
+}
+
+#play-gathering-description a {
+  text-decoration: underline;
+}
