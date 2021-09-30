@@ -3,6 +3,10 @@ var App = new Object();
 App.shouldStop = false;
 App.stopped = false;
 
+var thoughtsFormIsReady = false;
+var uploadIsFinished = false;
+var playSessionUUID = null;
+
 const videoElement = document.getElementById("video");
 const linkDownload = document.getElementById("link-download");
 const buttonRecord = document.getElementById("button-record");
@@ -11,6 +15,9 @@ const progressBarDiv = document.getElementById("upload-progress");
 const playGatheringTitle = document.getElementById("play-gathering-title");
 const playGatheringDescription = document.getElementById("play-gathering-description");
 
+const thoughtsFormDiv = document.getElementById("sa-contact-inner");
+const thoughtsForm = document.getElementById("thoughts-form");
+
 const recordSound = true;
 
 buttonRecord.style.display = "none";
@@ -18,7 +25,10 @@ buttonStop.style.display = "none";
 videoElement.style.display = "none";
 linkDownload.style.display = "none";
 progressBarDiv.style.display = "none";
-uploadProgressBarUpdate(0);
+thoughtsFormDiv.style.display = "none";
+
+
+
 
 
 function startRecord() {
@@ -31,11 +41,22 @@ function startRecord() {
 function stopRecord() {
   buttonStop.style.display = "none";
   progressBarDiv.style.display = "block";
+  thoughtsFormDiv.style.display = "block";
 }
 
-function uploadFinished() {
+function uploadFinished(_playSessionUUID) {
   linkDownload.style.display = "inline-block";
   progressBarDiv.style.display = "none";
+  uploadIsFinished = true;
+  playSessionUUID = _playSessionUUID;
+
+  if(thoughtsFormIsReady) {
+    thoughtsFormSend();
+  }
+}
+
+function sendingThoughtsFinished() {
+  console.log("sendingThoughtsFinished()");
 }
 
 const audioRecordConstraints = {
@@ -199,8 +220,7 @@ async function uploadFile(blob) {
   const play_gathering_api_url = getParam("play_gathering_api_url");
 
   let formData = new FormData();
-  formData.append("play_session[comment]", "SUPER GOOD COMMENT");
-  formData.append("play_session[time_in_minutes]", 10);
+  formData.append("play_session[time_in_minutes]", blob.duration);
   formData.append("play_session[video]", blob);
 
   try {
@@ -220,7 +240,7 @@ async function uploadFile(blob) {
 
     console.log("HTTP response:", response);
     console.log("HTTP response code:", response.status);
-    uploadFinished();
+    uploadFinished(response.data.uuid);
   } catch(e) {
     console.log("Huston we have problem...:", e);
   }
@@ -232,6 +252,51 @@ function uploadProgressBarUpdate(percentage) {
   bar.style.width = (percentage * 100) + "%";
 }
 
+function captureThoughtsFormSubmit() {
+  thoughtsForm.addEventListener("submit", event => {
+    event.preventDefault();
+    thoughtsFormReady();
+  });
+}
+
+function thoughtsFormReady() {
+  thoughtsFormIsReady = true;
+  thoughtsFormDiv.style.display = "none";
+
+  if(uploadIsFinished) {
+    thoughtsFormSend();
+  }
+}
+
+async function thoughtsFormSend() {
+  const play_gathering_api_url = getParam("play_gathering_api_url");
+
+  let formData = new FormData();
+  formData.append("play_session[user_name]", thoughtsForm.querySelector('[name="name"]').value );
+  formData.append("play_session[user_email]", thoughtsForm.querySelector('[name="email"]').value );
+  formData.append("play_session[user_comment]", thoughtsForm.querySelector('[name="comment"]').value );
+
+  try {
+    console.log("Start sending thoughts");
+
+    let response =
+      await axios.request({
+        method: "put",
+        url: play_gathering_api_url + "/play_sessions/" + playSessionUUID,
+        data: formData,
+        headers: { "Authorization": "Playcocola FRONT_TOKEN" }
+      });
+
+    console.log("HTTP response:", response);
+    console.log("HTTP response code:", response.status);
+    sendingThoughtsFinished();
+  } catch(e) {
+    console.log("Huston we have problem...:", e);
+  }
+}
+
 
 // Start
+uploadProgressBarUpdate(0);
 getPlaySessionInfo();
+captureThoughtsFormSubmit();

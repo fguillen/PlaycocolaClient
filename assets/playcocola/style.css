@@ -134,3 +134,15 @@
 #play-gathering-description a {
   text-decoration: underline;
 }
+
+#sa-contact-inner {
+  background-color: #0F0034;
+}
+
+.sa-contact-inner-form {
+  padding-top: 1em;
+}
+
+#sa-contact-inner > div > div.saas_two_section_title.saas2-headline.text-center > p {
+  color: white;
+}
