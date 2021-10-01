@@ -221,7 +221,6 @@ async function uploadFile(blob) {
   const api_token = getParam("api_token");
 
   let formData = new FormData();
-  formData.append("play_session[time_in_minutes]", blob.duration);
   formData.append("play_session[video]", blob);
 
   try {
