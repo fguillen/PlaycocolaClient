@@ -43,7 +43,6 @@ function stopRecord() {
 }
 
 function uploadFinished(_playSessionUUID) {
-  // linkDownload.style.display = "inline-block";
   progressBarDiv.style.display = "none";
   thanksDiv.style.display = "block";
   uploadIsFinished = true;
@@ -103,10 +102,11 @@ const handleRecord = function ({stream, mimeType}) {
 };
 
 function finalBlob(blob) {
-  const filename = "MySuperGame_testrecording_" + Date.now();
+  const filename = "MyPlayTestingSession_" + Date.now();
   let videoUrl = URL.createObjectURL(blob);
   linkDownload.href = videoUrl;
   linkDownload.download = `${filename || "recording"}.webm`;
+  linkDownload.style.display = "inline-block";
 
   videoElement.srcObject = null;
   videoElement.src = videoUrl;
@@ -114,7 +114,7 @@ function finalBlob(blob) {
   videoElement.onloadeddata = function() {
     console.log("video.onloadeddata()");
     videoElement.controls = true;
-    videoElement.play();
+    videoElement.stop();
   }
 
   uploadFile(blob);
