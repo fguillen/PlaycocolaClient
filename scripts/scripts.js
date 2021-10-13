@@ -170,14 +170,14 @@ function getPlaySessionInfo() {
 }
 
 function showError(errorMessage) {
-  sendDebugEvent("ShowError", errorMessage);
   errorDiv.querySelector("#error-message").innerHTML = marked(errorMessage);
   errorDiv.style.display = "block";
+  sendDebugEvent("ShowError", errorMessage);
 }
 
 function closeErrorDiv() {
-  sendDebugEvent("CloseErrorDiv");
   errorDiv.style.display = "none";
+  sendDebugEvent("CloseErrorDiv");
   return false;
 }
 
@@ -447,9 +447,16 @@ function uuidv4() {
   );
 }
 
+function captureWindowErrors() {
+  window.addEventListener("error", function (error) {
+    console.log("error", error);
+    showError("We have detected an error:\n\n(" + error.lineno + ") " + error.message);
+  });
+}
 
 
 // Start
+captureWindowErrors();
 uploadProgressBarUpdate(0);
 getPlaySessionInfo();
 captureThoughtsFormSubmit();
