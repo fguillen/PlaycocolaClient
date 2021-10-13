@@ -18,8 +18,16 @@ const thoughtsFormDiv = document.getElementById("sa-contact-inner");
 const thoughtsForm = document.getElementById("thoughts-form");
 const thanksDiv = document.getElementById("thanks-div");
 const errorDiv = document.getElementById("error-div");
+const permissionForm = document.getElementById("permission-form");
+const permissionScreenBlock = document.getElementById("permission-screen-block");
+const permissionMicBlock = document.getElementById("permission-mic-block");
+const permissionScreenCheck = document.getElementById("permission-screen-check");
+const permissionMicCheck = document.getElementById("permission-mic-check");
 
-const recordSound = true;
+var recordSound = true;
+var screenStream;
+var micStream;
+
 
 buttonRecord.style.display = "none";
 buttonStop.style.display = "none";
@@ -29,7 +37,7 @@ progressBarDiv.style.display = "none";
 thoughtsFormDiv.style.display = "none";
 thanksDiv.style.display = "none";
 errorDiv.style.display = "none";
-
+permissionForm.style.display = "none";
 
 function startRecord() {
   buttonRecord.disabled = true;
@@ -137,7 +145,7 @@ function getPlaySessionInfo() {
     headers: { "Authorization": "Playcocola " + api_token }
   }).then(function(response) {
     showPlaySessionInfo(response.data);
-    buttonRecord.style.display = "inline-block";
+    showPermissionForm();
   }).catch(function (error) {
     const errorMessage = "There was a problem trying to get the information for this Play Session.\n\nPlease try again."
     console.error("On getPlaySessionInfo()", errorMessage);
@@ -152,6 +160,7 @@ function showError(errorMessage) {
 
 function closeError() {
   errorDiv.style.display = "none";
+  return false;
 }
 
 function makeAllLinksTargetBlank(element) {
@@ -163,6 +172,10 @@ function showPlaySessionInfo(info) {
   playGatheringTitle.textContent = info.title;
   playGatheringDescription.innerHTML = marked(info.description);
   makeAllLinksTargetBlank(playGatheringDescription);
+}
+
+function showPermissionForm() {
+  permissionForm.style.display = "block";
 }
 
 function getSeekableBlob(inputBlob, callback) {
@@ -207,21 +220,19 @@ async function recordScreen() {
     const audioContext = new AudioContext();
     const audioDestination = audioContext.createMediaStreamDestination();
 
-    const displayStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": true}});
-    if(displayStream.getAudioTracks().length > 0) {
-      const displayAudio = audioContext.createMediaStreamSource(displayStream);
+    if(screenStream.getAudioTracks().length > 0) {
+      const displayAudio = audioContext.createMediaStreamSource(screenStream);
       displayAudio.connect(audioDestination);
     } else {
-      console.error("displayStream.getAudioTracks().length is 0");
+      console.error("screenStream.getAudioTracks().length is 0");
     }
 
     if(recordSound){
-      const voiceStream = await navigator.mediaDevices.getUserMedia({ audio: {"echoCancellation": true}, video: false });
-      const userAudio = audioContext.createMediaStreamSource(voiceStream);
+      const userAudio = audioContext.createMediaStreamSource(micStream);
       userAudio.connect(audioDestination);
     }
 
-    const tracks = [...displayStream.getVideoTracks(), ...audioDestination.stream.getTracks()]
+    const tracks = [...screenStream.getVideoTracks(), ...audioDestination.stream.getTracks()]
     const stream = new MediaStream(tracks);
 
     handleRecord({stream, mimeType})
@@ -306,6 +317,59 @@ async function thoughtsFormSend() {
     sendingThoughtsFinished();
   } catch(e) {
     console.log("Huston we have problem...:", e);
+  }
+}
+
+async function captureScreenStream() {
+  try {
+    screenStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": true}});
+    permissionScreenBlock.style.display = "none";
+    checkAllPermissionsAccepted();
+  } catch (error) {
+    permissionScreenCheck.checked = false;
+    const errorMessage = "There was a problem trying to get permissions to record your screen.\n\nPlease try again.\n\nMaybe the permissions are block in the browser settings."
+    console.error("On captureScreenStream()", error);
+    showError(errorMessage);
+  }
+}
+
+async function captureMicStream() {
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: {"echoCancellation": true}, video: false });
+    permissionMicBlock.style.display = "none";
+    checkAllPermissionsAccepted();
+  } catch (error) {
+    permissionMicCheck.checked = false;
+    const errorMessage = "There was a problem trying to get permissions to record your mic.\n\nPlease try again.\n\nMaybe the permissions are block in the browser settings."
+    console.error("On captureMicStream()", error);
+    showError(errorMessage);
+  }
+}
+
+function checkAllPermissionsAccepted() {
+  if(permissionScreenCheck.checked && permissionMicCheck.checked) {
+    showButtonRecord();
+    hidePermissionForm();
+  }
+}
+
+function hidePermissionForm () {
+  permissionForm.style.display = "none";
+}
+
+function showButtonRecord() {
+  buttonRecord.style.display = "inline-block";
+}
+
+function clickOnPermissionScreenCheck() {
+  if(permissionScreenCheck.checked) {
+    captureScreenStream();
+  }
+}
+
+function clickOnPermissionMicCheck() {
+  if(permissionMicCheck.checked) {
+    captureMicStream();
   }
 }
 

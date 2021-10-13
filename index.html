@@ -101,7 +101,7 @@
 
     <!-- Permissions :: INI
         ============================================= -->
-        <section id="feature-eight" class="feature-eight-section position-relative" style="padding-top: 40px; padding-bottom: 0px;">
+        <section id="permission-form" class="feature-eight-section position-relative" style="padding-top: 40px; padding-bottom: 0px;">
           <div class="container">
               <div class="eight-section-title appeight-headline pera-content text-center">
                   <span class="eg-title-tag">
@@ -110,13 +110,13 @@
                   <h2>We kindly ask for your permission to record your screen and mic</h2>
                   <div class="text-left permission-checks text-center">
 
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="permission-screen-check">
+                    <div class="custom-control custom-checkbox" id="permission-screen-block">
+                      <input onclick="clickOnPermissionScreenCheck()" type="checkbox" class="custom-control-input" id="permission-screen-check">
                       <label class="custom-control-label" for="permission-screen-check">Allow screen recording</label>
                     </div>
 
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" class="custom-control-input" id="permission-mic-check">
+                    <div class="custom-control custom-checkbox" id="permission-mic-block">
+                      <input onclick="clickOnPermissionMicCheck()" type="checkbox" class="custom-control-input" id="permission-mic-check">
                       <label class="custom-control-label" for="permission-mic-check">Allow mic recording</label>
                     </div>
 
@@ -133,10 +133,10 @@
         <section id="error-div" class="feature-eight-section" style="padding-top: 0px; padding-bottom: 50px;">
           <div class="eight-feature-content">
             <div class="row justify-content-md-center">
-                <div class="col-lg-6 col-md-6  wow fadeFromUp" data-wow-delay="0ms" data-wow-duration="500ms">
+                <div class="col-lg-6 col-md-6">
                     <div class="eight-feature-box text-center position-relative">
                         <div class="ei-feature-close">
-                          <a href="#" onclick="closeError()"><i class="far fa-times-circle"></i></a>
+                          <a href="#" onclick="closeError(); return false;"><i class="far fa-times-circle"></i></a>
                         </div>
                         <div class="feature-icon8 position-relative">
                             <i class="flaticon-064-stethoscope"></i>
