@@ -88,7 +88,7 @@
             <div class="container">
                 <div class="eight-section-title appeight-headline pera-content text-center">
                     <span class="eg-title-tag">
-                        Thanks for testing <i class="square-shape"><i></i><i></i> <i></i> <i></i> </i>
+                        Developer's message <i class="square-shape"><i></i><i></i> <i></i> <i></i> </i>
                     </span>
                     <h2 id="play-gathering-title">Loading play test info</h2>
                     <div id="play-gathering-description" class="text-left"></div>
@@ -97,6 +97,68 @@
             <div class="ei-feature-shape"><img src="assets/img/app-landing/shape/f-shape1.png" alt=""></div>
         </section>
     <!-- End of Featured section
+        ============================================= -->
+
+    <!-- Permissions :: INI
+        ============================================= -->
+        <section id="feature-eight" class="feature-eight-section position-relative" style="padding-top: 40px; padding-bottom: 0px;">
+          <div class="container">
+              <div class="eight-section-title appeight-headline pera-content text-center">
+                  <span class="eg-title-tag">
+                      The permissions <i class="square-shape"><i></i><i></i> <i></i> <i></i> </i>
+                  </span>
+                  <h2>We kindly ask for your permission to record your screen and mic</h2>
+                  <div class="text-left permission-checks text-center">
+
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="permission-screen-check">
+                      <label class="custom-control-label" for="permission-screen-check">Allow screen recording</label>
+                    </div>
+
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input" id="permission-mic-check">
+                      <label class="custom-control-label" for="permission-mic-check">Allow mic recording</label>
+                    </div>
+
+                  </div>
+                  <!-- /title -->
+              </div>
+          <div class="ei-feature-shape"><img src="assets/img/app-landing/shape/f-shape1.png" alt=""></div>
+      </section>
+  <!-- Permissions :: END
+      ============================================= -->
+
+    <!-- Error div :: INI
+        ============================================= -->
+        <section id="error-div" class="feature-eight-section" style="padding-top: 0px; padding-bottom: 50px;">
+          <div class="eight-feature-content">
+            <div class="row justify-content-md-center">
+                <div class="col-lg-6 col-md-6  wow fadeFromUp" data-wow-delay="0ms" data-wow-duration="500ms">
+                    <div class="eight-feature-box text-center position-relative">
+                        <div class="ei-feature-close">
+                          <a href="#" onclick="closeError()"><i class="far fa-times-circle"></i></a>
+                        </div>
+                        <div class="feature-icon8 position-relative">
+                            <i class="flaticon-064-stethoscope"></i>
+                            <span class="ei-icon-bg"></span>
+                        </div>
+                        <div class="feature-text8 appeight-headline pera-content">
+                            <h3>An error ocurred</h3>
+                            <p id="error-message">
+                              There was some problem when asking for the video screen recoding permission. Please
+                              check the browser settings and try again.
+                            </p>
+                            <p class="mt-1">If the problem persists you can try to reload the page by clicking in the below icon:</p>
+                        </div>
+                        <div class="ei-feature-more">
+                            <a href="#" onclick="refreshPage()"><i class="fas fa-redo"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </section>
+    <!-- Error div :: END
         ============================================= -->
 
     <!-- Start of Contact inner page section
@@ -138,6 +200,7 @@
               <div class="eight-banner-content">
                   <div class="banner-content-box appeight-headline pera-content">
                       <div class="ei-banner-btn">
+
                         <button class="button-nice color-1" id="button-record"><i class="fas fa-power-off"></i> Start Session</button>
                         <button class="button-nice color-2" id="button-stop"><i class="far fa-stop-circle"></i> Finish Session</button>
 

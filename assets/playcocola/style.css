@@ -163,3 +163,22 @@
   bottom: -15px;
   visibility: visible;
 }
+
+
+.feature-eight-section .eight-feature-box .ei-feature-close {
+  position: absolute;
+  background-color: #4ce7f3;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  line-height: 30px;
+  transition: 0.3s all ease-in-out;
+  right: 1em;
+  bottom: 0px;
+  margin: 0 auto;
+  top: 1em;
+}
+
+.permission-checks {
+  color: white;
+}

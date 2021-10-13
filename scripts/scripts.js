@@ -17,6 +17,7 @@ const playGatheringDescription = document.getElementById("play-gathering-descrip
 const thoughtsFormDiv = document.getElementById("sa-contact-inner");
 const thoughtsForm = document.getElementById("thoughts-form");
 const thanksDiv = document.getElementById("thanks-div");
+const errorDiv = document.getElementById("error-div");
 
 const recordSound = true;
 
@@ -27,6 +28,7 @@ linkDownload.style.display = "none";
 progressBarDiv.style.display = "none";
 thoughtsFormDiv.style.display = "none";
 thanksDiv.style.display = "none";
+errorDiv.style.display = "none";
 
 
 function startRecord() {
@@ -125,20 +127,31 @@ function getParam(param){
   return new URLSearchParams(window.location.search).get(param);
 }
 
-async function getPlaySessionInfo() {
+function getPlaySessionInfo() {
   const play_gathering_api_url = getParam("play_gathering_api_url");
   const api_token = getParam("api_token");
 
-  let response =
-    await axios.request({
-      method: "get",
-      url: play_gathering_api_url,
-      headers: { "Authorization": "Playcocola " + api_token }
-    });
+  axios.request({
+    method: "get",
+    url: play_gathering_api_url,
+    headers: { "Authorization": "Playcocola " + api_token }
+  }).then(function(response) {
+    showPlaySessionInfo(response.data);
+    buttonRecord.style.display = "inline-block";
+  }).catch(function (error) {
+    const errorMessage = "There was a problem trying to get the information for this Play Session.\n\nPlease try again."
+    console.error("On getPlaySessionInfo()", errorMessage);
+    showError(errorMessage);
+  });
+}
 
-  showPlaySessionInfo(response.data);
+function showError(errorMessage) {
+  errorDiv.querySelector("#error-message").innerHTML = marked(errorMessage);
+  errorDiv.style.display = "block";
+}
 
-  buttonRecord.style.display = "inline-block";
+function closeError() {
+  errorDiv.style.display = "none";
 }
 
 function makeAllLinksTargetBlank(element) {
