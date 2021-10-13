@@ -181,4 +181,24 @@
 
 .permission-checks {
   color: white;
+  font-size: 1.5em;
+}
+
+
+.eg-how-work-section .how-work-scroller {
+  height: 510px;
+}
+
+
+/* Check box switch */
+.custom-control-label::before {
+  left: -2rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.custom-control-label::after {
+  left: -2rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
