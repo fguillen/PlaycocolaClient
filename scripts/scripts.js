@@ -27,6 +27,7 @@ const permissionMicCheck = document.getElementById("permission-mic-check");
 var recordSound = true;
 var screenStream;
 var micStream;
+var debugSessionID;
 
 
 buttonRecord.style.display = "none";
@@ -79,8 +80,11 @@ buttonStop.addEventListener("click", function () {
     App.shouldStop = true;
 });
 
+var dataSize = 0;
+var lastDataSizeDebugEvent = 0;
 const handleRecord = function ({stream, mimeType}) {
-    startRecord()
+    sendDebugEvent("HandleRecord", "ini");
+    startRecord();
     let recordedChunks = [];
     App.stopped = false;
     const mediaRecorder = new MediaRecorder(stream);
@@ -88,6 +92,12 @@ const handleRecord = function ({stream, mimeType}) {
     mediaRecorder.ondataavailable = function (e) {
         if (e.data.size > 0) {
             recordedChunks.push(e.data);
+            dataSize += e.data.size;
+
+            if(dataSize > (lastDataSizeDebugEvent + (10*1024*1024))) { // 10MBs
+              sendDebugEvent("FileDataSize", (dataSize / (1024*1024)).toFixed(2)); // MBs
+              lastDataSizeDebugEvent = dataSize;
+            }
         }
 
         if (App.shouldStop === true && App.stopped === false) {
@@ -97,6 +107,7 @@ const handleRecord = function ({stream, mimeType}) {
     };
 
     mediaRecorder.onstop = function () {
+      sendDebugEvent("HandleRecord", "end");
       const blob = new Blob(recordedChunks, {
           type: mimeType
       });
@@ -112,6 +123,7 @@ const handleRecord = function ({stream, mimeType}) {
 };
 
 function finalBlob(blob) {
+  sendDebugEvent("FinalBlob", "ini");
   const filename = "MyPlayTestingSession_" + Date.now();
   let videoUrl = URL.createObjectURL(blob);
   linkDownload.href = videoUrl;
@@ -127,6 +139,7 @@ function finalBlob(blob) {
     videoElement.stop();
   }
 
+  sendDebugEvent("FinalBlob", "end");
   uploadFile(blob);
 }
 
@@ -136,6 +149,7 @@ function getParam(param){
 }
 
 function getPlaySessionInfo() {
+  sendDebugEvent("GetPlaySessionInfo", "ini");
   const play_gathering_api_url = getParam("play_gathering_api_url");
   const api_token = getParam("api_token");
 
@@ -146,7 +160,9 @@ function getPlaySessionInfo() {
   }).then(function(response) {
     showPlaySessionInfo(response.data);
     showPermissionForm();
+    sendDebugEvent("GetPlaySessionInfo", "end");
   }).catch(function (error) {
+    sendDebugEvent("GetPlaySessionInfo", "error");
     const errorMessage = "There was a problem trying to get the information for this Play Session.\n\nPlease try again."
     console.error("On getPlaySessionInfo()", errorMessage);
     showError(errorMessage);
@@ -154,11 +170,13 @@ function getPlaySessionInfo() {
 }
 
 function showError(errorMessage) {
+  sendDebugEvent("ShowError", errorMessage);
   errorDiv.querySelector("#error-message").innerHTML = marked(errorMessage);
   errorDiv.style.display = "block";
 }
 
-function closeError() {
+function closeErrorDiv() {
+  sendDebugEvent("CloseErrorDiv");
   errorDiv.style.display = "none";
   return false;
 }
@@ -179,6 +197,7 @@ function showPermissionForm() {
 }
 
 function getSeekableBlob(inputBlob, callback) {
+  sendDebugEvent("GetSeekableBlob", "ini");
   // EBML.js copyrights goes to: https://github.com/legokichi/ts-ebml
   if (typeof EBML === 'undefined') {
       throw new Error('Please link: https://cdn.webrtc-experiment.com/EBML.js');
@@ -198,6 +217,7 @@ function getSeekableBlob(inputBlob, callback) {
       var newBlob = new Blob([refinedMetadataBuf, body], {
           type: 'video/webm'
       });
+      sendDebugEvent("GetSeekableBlob", "end");
       callback(newBlob);
   };
   fileReader.readAsArrayBuffer(inputBlob);
@@ -241,6 +261,7 @@ async function recordScreen() {
 }
 
 async function uploadFile(blob) {
+  sendDebugEvent("UploadFile", "ini");
   const play_gathering_api_url = getParam("play_gathering_api_url");
   const api_token = getParam("api_token");
 
@@ -264,13 +285,20 @@ async function uploadFile(blob) {
 
     console.log("HTTP response:", response);
     console.log("HTTP response code:", response.status);
+    sendDebugEvent("UploadFile", "end");
     uploadFinished(response.data.uuid);
   } catch(e) {
     console.log("Huston we have problem...:", e);
   }
 }
 
+var lastUploadPercentageDebugEvent = 0;
 function uploadProgressBarUpdate(percentage) {
+  if(percentage > lastUploadPercentageDebugEvent + 0.1) {
+    sendDebugEvent("UploadProgressBarUpdate", (percentage * 100).toFixed(2));
+    lastUploadPercentageDebugEvent = percentage;
+  }
+
   const bar = progressBarDiv.querySelector(".progress-bar");
   bar.setAttribute("aria-valuenow", percentage * 100);
   bar.style.width = (percentage * 100) + "%";
@@ -293,6 +321,7 @@ function thoughtsFormReady() {
 }
 
 async function thoughtsFormSend() {
+  sendDebugEvent("ThoughtsFormSend", "ini");
   const play_gathering_api_url = getParam("play_gathering_api_url");
   const api_token = getParam("api_token");
 
@@ -314,6 +343,7 @@ async function thoughtsFormSend() {
 
     console.log("HTTP response:", response);
     console.log("HTTP response code:", response.status);
+    sendDebugEvent("ThoughtsFormSend", "end");
     sendingThoughtsFinished();
   } catch(e) {
     console.log("Huston we have problem...:", e);
@@ -321,11 +351,14 @@ async function thoughtsFormSend() {
 }
 
 async function captureScreenStream() {
+  sendDebugEvent("CaptureScreenStream", "ini");
   try {
     screenStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": true}});
     permissionScreenBlock.style.display = "none";
+    sendDebugEvent("CaptureScreenStream", "end");
     checkAllPermissionsAccepted();
   } catch (error) {
+    sendDebugEvent("CaptureScreenStream", "error");
     permissionScreenCheck.checked = false;
     const errorMessage = "There was a problem trying to get permissions to record your screen.\n\nPlease try again.\n\nMaybe the permissions are block in the browser settings."
     console.error("On captureScreenStream()", error);
@@ -334,11 +367,14 @@ async function captureScreenStream() {
 }
 
 async function captureMicStream() {
+  sendDebugEvent("CaptureMicStream", "ini");
   try {
     micStream = await navigator.mediaDevices.getUserMedia({ audio: {"echoCancellation": true}, video: false });
     permissionMicBlock.style.display = "none";
+    sendDebugEvent("CaptureMicStream", "end");
     checkAllPermissionsAccepted();
   } catch (error) {
+    sendDebugEvent("CaptureMicStream", "error");
     permissionMicCheck.checked = false;
     const errorMessage = "There was a problem trying to get permissions to record your mic.\n\nPlease try again.\n\nMaybe the permissions are block in the browser settings."
     console.error("On captureMicStream()", error);
@@ -348,6 +384,7 @@ async function captureMicStream() {
 
 function checkAllPermissionsAccepted() {
   if(permissionScreenCheck.checked && permissionMicCheck.checked) {
+    sendDebugEvent("AllPermissionsAccepted");
     showButtonRecord();
     hidePermissionForm();
   }
@@ -374,11 +411,47 @@ function clickOnPermissionMicCheck() {
 }
 
 function refreshPage() {
+  sendDebugEvent("RefreshPage");
   location.reload();
 }
+
+function sendDebugEvent(name, value = null) {
+  console.log("sendDebugEvent()", name, value);
+  const debug_session_api_url = getParam("debug_session_api_url");
+  const api_token = getParam("api_token");
+  const front_user_id = getParam("front_user_id");
+
+  let formData = new FormData();
+  formData.append("front_user_id", front_user_id);
+  formData.append("name", name);
+  formData.append("value", value);
+
+  axios.request({
+    method: "post",
+    url: debug_session_api_url.replace("DEBUG_SESSION_UUID", debugSessionID),
+    data: formData,
+    headers: { "Authorization": "Playcocola " + api_token }
+  }).catch(function (error) {
+    console.error("On getPlaySessionInfo()", error);
+  });
+}
+
+function initDebugSessionId() {
+  debugSessionID = uuidv4();
+}
+
+// From: https://stackoverflow.com/a/2117523/316700
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+
 
 
 // Start
 uploadProgressBarUpdate(0);
 getPlaySessionInfo();
 captureThoughtsFormSubmit();
+initDebugSessionId();
+sendDebugEvent("PageLoaded");
