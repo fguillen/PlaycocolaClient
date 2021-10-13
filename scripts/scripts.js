@@ -136,7 +136,7 @@ function finalBlob(blob) {
   videoElement.onloadeddata = function() {
     console.log("video.onloadeddata()");
     videoElement.controls = true;
-    videoElement.stop();
+    // videoElement.stop();
   }
 
   sendDebugEvent("FinalBlob", "end");
