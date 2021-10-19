@@ -202,3 +202,8 @@
   width: 1.5rem;
   height: 1.5rem;
 }
+
+
+.feature-eight-section .eight-section-title {
+  max-width: 750px;
+}
