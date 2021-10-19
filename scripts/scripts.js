@@ -24,7 +24,6 @@ const permissionMicBlock = document.getElementById("permission-mic-block");
 const permissionScreenCheck = document.getElementById("permission-screen-check");
 const permissionMicCheck = document.getElementById("permission-mic-check");
 
-var recordSound = true;
 var screenStream;
 var micStream;
 var debugSessionID;
@@ -77,6 +76,7 @@ buttonRecord.addEventListener("click", function () {
 });
 
 buttonStop.addEventListener("click", function () {
+    sendDebugEvent("buttonStop Clicked");
     App.shouldStop = true;
 });
 
@@ -90,6 +90,8 @@ const handleRecord = function ({stream, mimeType}) {
     const mediaRecorder = new MediaRecorder(stream);
 
     mediaRecorder.ondataavailable = function (e) {
+        console.log("ondataavailable", e.data.size);
+
         if (e.data.size > 0) {
             recordedChunks.push(e.data);
             dataSize += e.data.size;
@@ -101,6 +103,7 @@ const handleRecord = function ({stream, mimeType}) {
         }
 
         if (App.shouldStop === true && App.stopped === false) {
+            sendDebugEvent("StopRecording");
             mediaRecorder.stop();
             App.stopped = true;
         }
@@ -224,6 +227,8 @@ function getSeekableBlob(inputBlob, callback) {
 }
 
 async function recordScreen() {
+    sendDebugEvent("recordScreen", "ini");
+    hidePermissionForm();
     App.shouldStop = false;
 
     const mimeType = "video/webm;codecs=vp9";
@@ -241,23 +246,36 @@ async function recordScreen() {
     const audioDestination = audioContext.createMediaStreamDestination();
 
     if(screenStream.getAudioTracks().length > 0) {
+      sendDebugEvent("screenStream.getAudioTracks", "system_sound");
       const displayAudio = audioContext.createMediaStreamSource(screenStream);
       displayAudio.connect(audioDestination);
     } else {
-      console.error("screenStream.getAudioTracks().length is 0");
+      sendDebugEvent("screenStream.getAudioTracks", "no_system_sound");
+      console.log("screenStream.getAudioTracks().length is 0");
     }
 
-    if(recordSound){
+    if(permissionMicCheck.checked){
       const userAudio = audioContext.createMediaStreamSource(micStream);
       userAudio.connect(audioDestination);
     }
 
-    const tracks = [...screenStream.getVideoTracks(), ...audioDestination.stream.getTracks()]
+    console.log("audioDestination.stream.getTracks():", audioDestination.stream.getTracks());
+
+    var tracks;
+
+    // if I don't this then the loop mediaRecorder.ondataavailable is never called when mic is not accepted (Mac)
+    if(screenStream.getAudioTracks().length > 0 || permissionMicCheck.checked) {
+      tracks = [...screenStream.getVideoTracks(), ...audioDestination.stream.getTracks()];
+    } else {
+      tracks = [...screenStream.getVideoTracks()];
+    }
+
     const stream = new MediaStream(tracks);
 
     handleRecord({stream, mimeType})
 
     videoElement.srcObject = stream;
+    sendDebugEvent("recordScreen", "end");
 }
 
 async function uploadFile(blob) {
@@ -356,7 +374,7 @@ async function captureScreenStream() {
     screenStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": true}});
     permissionScreenBlock.style.display = "none";
     sendDebugEvent("CaptureScreenStream", "end");
-    checkAllPermissionsAccepted();
+    checkScreenPermissionsAccepted();
   } catch (error) {
     sendDebugEvent("CaptureScreenStream", "error");
     permissionScreenCheck.checked = false;
@@ -372,7 +390,7 @@ async function captureMicStream() {
     micStream = await navigator.mediaDevices.getUserMedia({ audio: {"echoCancellation": true}, video: false });
     permissionMicBlock.style.display = "none";
     sendDebugEvent("CaptureMicStream", "end");
-    checkAllPermissionsAccepted();
+    checkScreenPermissionsAccepted();
   } catch (error) {
     sendDebugEvent("CaptureMicStream", "error");
     permissionMicCheck.checked = false;
@@ -382,11 +400,10 @@ async function captureMicStream() {
   }
 }
 
-function checkAllPermissionsAccepted() {
-  if(permissionScreenCheck.checked && permissionMicCheck.checked) {
-    sendDebugEvent("AllPermissionsAccepted");
+function checkScreenPermissionsAccepted() {
+  if(permissionScreenCheck.checked) {
+    sendDebugEvent("ScreenPermissionsAccepted");
     showButtonRecord();
-    hidePermissionForm();
   }
 }
 
