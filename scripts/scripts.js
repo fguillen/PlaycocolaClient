@@ -247,11 +247,15 @@ async function recordScreen() {
 
     if(screenStream.getAudioTracks().length > 0) {
       sendDebugEvent("screenStream.getAudioTracks", "system_sound");
+      const gainNode = audioContext.createGain();
+      gainNode.gain.value = 0.1;
+
       const displayAudio = audioContext.createMediaStreamSource(screenStream);
-      displayAudio.connect(audioDestination);
+      displayAudio.connect(gainNode);
+
+      gainNode.connect(audioDestination);
     } else {
       sendDebugEvent("screenStream.getAudioTracks", "no_system_sound");
-      console.log("screenStream.getAudioTracks().length is 0");
     }
 
     if(permissionMicCheck.checked){
