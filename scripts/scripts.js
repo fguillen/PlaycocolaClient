@@ -379,6 +379,7 @@ async function captureScreenStream() {
     permissionScreenBlock.style.display = "none";
     sendDebugEvent("CaptureScreenStream", "end");
     checkScreenPermissionsAccepted();
+    checkAllPermissionsAccepted();
   } catch (error) {
     sendDebugEvent("CaptureScreenStream", "error");
     permissionScreenCheck.checked = false;
@@ -395,6 +396,7 @@ async function captureMicStream() {
     permissionMicBlock.style.display = "none";
     sendDebugEvent("CaptureMicStream", "end");
     checkScreenPermissionsAccepted();
+    checkAllPermissionsAccepted();
   } catch (error) {
     sendDebugEvent("CaptureMicStream", "error");
     permissionMicCheck.checked = false;
@@ -408,6 +410,13 @@ function checkScreenPermissionsAccepted() {
   if(permissionScreenCheck.checked) {
     sendDebugEvent("ScreenPermissionsAccepted");
     showButtonRecord();
+  }
+}
+
+function checkAllPermissionsAccepted() {
+  if(permissionScreenCheck.checked && permissionMicCheck.checked) {
+    sendDebugEvent("AllPermissionsAccepted");
+    hidePermissionForm();
   }
 }
 

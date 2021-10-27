@@ -207,3 +207,7 @@
 .feature-eight-section .eight-section-title {
   max-width: 750px;
 }
+
+.eg-how-work-text > p {
+  margin-left: 100px;
+}
