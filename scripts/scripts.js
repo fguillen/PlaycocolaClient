@@ -28,6 +28,10 @@ var screenStream;
 var micStream;
 var debugSessionID;
 
+var play_gathering_api_url;
+var play_session_api_url;
+var api_token;
+
 
 buttonRecord.style.display = "none";
 buttonStop.style.display = "none";
@@ -78,42 +82,30 @@ buttonRecord.addEventListener("click", function () {
 buttonStop.addEventListener("click", function () {
     sendDebugEvent("buttonStop Clicked");
     App.shouldStop = true;
+    App.stopped = true;
+    mediaRecorder.stop();
 });
 
 var dataSize = 0;
 var lastDataSizeDebugEvent = 0;
+var mediaRecorder;
 const handleRecord = function ({stream, mimeType}) {
-    sendDebugEvent("HandleRecord", "ini");
+    sendDebugEvent("HandleRecord :: ini");
     startRecord();
     let recordedChunks = [];
     App.stopped = false;
-    const mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder = new MediaRecorder(stream);
 
     mediaRecorder.ondataavailable = function (e) {
-        console.log("ondataavailable", e.data.size);
-
-        if (e.data.size > 0) {
-            recordedChunks.push(e.data);
-            dataSize += e.data.size;
-
-            if(dataSize > (lastDataSizeDebugEvent + (10*1024*1024))) { // 10MBs
-              sendDebugEvent("FileDataSize", (dataSize / (1024*1024)).toFixed(2)); // MBs
-              lastDataSizeDebugEvent = dataSize;
-            }
-        }
-
-        if (App.shouldStop === true && App.stopped === false) {
-            sendDebugEvent("StopRecording");
-            mediaRecorder.stop();
-            App.stopped = true;
-        }
+      console.log("ondataavailable", e.data.size);
+      recordedChunks.push(e.data);
+      // getSeekableBlob(new Blob([e.data], { type: mimeType }), uploadVideoPart);
+      uploadVideoPart(e.data);
     };
 
     mediaRecorder.onstop = function () {
-      sendDebugEvent("HandleRecord", "end");
-      const blob = new Blob(recordedChunks, {
-          type: mimeType
-      });
+      sendDebugEvent("HandleRecord :: end");
+      const blob = new Blob(recordedChunks, { type: mimeType });
       stopRecord();
       recordedChunks = [];
 
@@ -122,11 +114,16 @@ const handleRecord = function ({stream, mimeType}) {
       stream.getTracks().forEach( track => track.stop() );
     };
 
-    mediaRecorder.start(200);
+    mediaRecorder.start(1000); // 1 second
 };
 
+function recordVideoChunk(stream)
+{
+
+}
+
 function finalBlob(blob) {
-  sendDebugEvent("FinalBlob", "ini");
+  sendDebugEvent("FinalBlob :: ini");
   const filename = "MyPlayTestingSession_" + Date.now();
   let videoUrl = URL.createObjectURL(blob);
   linkDownload.href = videoUrl;
@@ -142,7 +139,7 @@ function finalBlob(blob) {
     // videoElement.stop();
   }
 
-  sendDebugEvent("FinalBlob", "end");
+  sendDebugEvent("FinalBlob :: end");
   uploadFile(blob);
 }
 
@@ -152,20 +149,19 @@ function getParam(param){
 }
 
 function getPlaySessionInfo() {
-  sendDebugEvent("GetPlaySessionInfo", "ini");
-  const play_gathering_api_url = getParam("play_gathering_api_url");
-  const api_token = getParam("api_token");
+  // sendDebugEvent("GetPlaySessionInfo :: ini");
 
   axios.request({
     method: "get",
     url: play_gathering_api_url,
     headers: { "Authorization": "Playcocola " + api_token }
   }).then(function(response) {
-    showPlaySessionInfo(response.data);
+    iniPlaySessionAPIUrl(response.data.play_session_api_url);
+    showPlaySessionInfo(response.data.play_gathering);
     showPermissionForm();
-    sendDebugEvent("GetPlaySessionInfo", "end");
+    sendDebugEvent("GetPlaySessionInfo :: end");
   }).catch(function (error) {
-    sendDebugEvent("GetPlaySessionInfo", "error");
+    sendDebugEvent("GetPlaySessionInfo :: error");
     const errorMessage = "There was a problem trying to get the information for this Play Session.\n\nPlease try again."
     console.error("On getPlaySessionInfo()", errorMessage);
     showError(errorMessage);
@@ -175,7 +171,7 @@ function getPlaySessionInfo() {
 function showError(errorMessage) {
   errorDiv.querySelector("#error-message").innerHTML = marked(errorMessage);
   errorDiv.style.display = "block";
-  sendDebugEvent("ShowError", errorMessage);
+  sendDebugEvent("ShowError: " + errorMessage);
 }
 
 function closeErrorDiv() {
@@ -200,7 +196,7 @@ function showPermissionForm() {
 }
 
 function getSeekableBlob(inputBlob, callback) {
-  sendDebugEvent("GetSeekableBlob", "ini");
+  sendDebugEvent("GetSeekableBlob : ini");
   // EBML.js copyrights goes to: https://github.com/legokichi/ts-ebml
   if (typeof EBML === 'undefined') {
       throw new Error('Please link: https://cdn.webrtc-experiment.com/EBML.js');
@@ -220,14 +216,14 @@ function getSeekableBlob(inputBlob, callback) {
       var newBlob = new Blob([refinedMetadataBuf, body], {
           type: 'video/webm'
       });
-      sendDebugEvent("GetSeekableBlob", "end");
+      sendDebugEvent("GetSeekableBlob :: end");
       callback(newBlob);
   };
   fileReader.readAsArrayBuffer(inputBlob);
 }
 
 async function recordScreen() {
-    sendDebugEvent("recordScreen", "ini");
+    sendDebugEvent("recordScreen :: ini");
     hidePermissionForm();
     App.shouldStop = false;
 
@@ -246,7 +242,7 @@ async function recordScreen() {
     const audioDestination = audioContext.createMediaStreamDestination();
 
     if(screenStream.getAudioTracks().length > 0) {
-      sendDebugEvent("screenStream.getAudioTracks", "system_sound");
+      sendDebugEvent("screenStream.getAudioTracks :: system_sound");
       const gainNode = audioContext.createGain();
       gainNode.gain.value = 0.1;
 
@@ -255,7 +251,7 @@ async function recordScreen() {
 
       gainNode.connect(audioDestination);
     } else {
-      sendDebugEvent("screenStream.getAudioTracks", "no_system_sound");
+      sendDebugEvent("screenStream.getAudioTracks :: no_system_sound");
     }
 
     if(permissionMicCheck.checked){
@@ -279,16 +275,14 @@ async function recordScreen() {
     handleRecord({stream, mimeType})
 
     videoElement.srcObject = stream;
-    sendDebugEvent("recordScreen", "end");
+    sendDebugEvent("recordScreen :: end");
 }
 
-async function uploadFile(blob) {
-  sendDebugEvent("UploadFile", "ini");
-  const play_gathering_api_url = getParam("play_gathering_api_url");
-  const api_token = getParam("api_token");
+async function uploadVideoPart(blob) {
+  sendDebugEvent("uploadVideoPart :: ini");
 
   let formData = new FormData();
-  formData.append("play_session[video]", blob);
+  formData.append("video_part", blob);
 
   try {
     console.log("Start uploading");
@@ -296,7 +290,7 @@ async function uploadFile(blob) {
     let response =
       await axios.request({
         method: "post",
-        url: play_gathering_api_url + "/play_sessions",
+        url: play_session_api_url + "/video_part",
         data: formData,
         headers: { "Authorization": "Playcocola " + api_token },
         onUploadProgress: (p) => {
@@ -307,17 +301,47 @@ async function uploadFile(blob) {
 
     console.log("HTTP response:", response);
     console.log("HTTP response code:", response.status);
-    sendDebugEvent("UploadFile", "end");
+    sendDebugEvent("uploadVideoPart :: end");
+    progressBarDiv.style.display = "none";
+  } catch(e) {
+    console.log("Error on uploadVideoPart()...:", e);
+  }
+}
+
+async function uploadFile(blob) {
+  sendDebugEvent("UploadFile :: ini");
+
+  let formData = new FormData();
+  formData.append("video", blob);
+
+  try {
+    console.log("Start uploading");
+
+    let response =
+      await axios.request({
+        method: "post",
+        url: play_session_api_url + "/video",
+        data: formData,
+        headers: { "Authorization": "Playcocola " + api_token },
+        onUploadProgress: (p) => {
+          console.log("progress: ", p);
+          uploadProgressBarUpdate(p.loaded / p.total);
+        }
+      });
+
+    console.log("HTTP response:", response);
+    console.log("HTTP response code:", response.status);
+    sendDebugEvent("UploadFile :: end");
     uploadFinished(response.data.uuid);
   } catch(e) {
-    console.log("Huston we have problem...:", e);
+    console.log("Error on uploadFile...:", e);
   }
 }
 
 var lastUploadPercentageDebugEvent = 0;
 function uploadProgressBarUpdate(percentage) {
   if(percentage > lastUploadPercentageDebugEvent + 0.1) {
-    sendDebugEvent("UploadProgressBarUpdate", (percentage * 100).toFixed(2));
+    sendDebugEvent("UploadProgressBarUpdate: " + (percentage * 100).toFixed(2));
     lastUploadPercentageDebugEvent = percentage;
   }
 
@@ -343,29 +367,27 @@ function thoughtsFormReady() {
 }
 
 async function thoughtsFormSend() {
-  sendDebugEvent("ThoughtsFormSend", "ini");
-  const play_gathering_api_url = getParam("play_gathering_api_url");
-  const api_token = getParam("api_token");
+  sendDebugEvent("ThoughtsFormSend :: ini");
 
   let formData = new FormData();
-  formData.append("play_session[user_name]", thoughtsForm.querySelector('[name="name"]').value );
-  formData.append("play_session[user_email]", thoughtsForm.querySelector('[name="email"]').value );
-  formData.append("play_session[user_comment]", thoughtsForm.querySelector('[name="comment"]').value );
+  formData.append("user_name", thoughtsForm.querySelector('[name="name"]').value );
+  formData.append("user_email", thoughtsForm.querySelector('[name="email"]').value );
+  formData.append("user_comment", thoughtsForm.querySelector('[name="comment"]').value );
 
   try {
     console.log("Start sending thoughts");
 
     let response =
       await axios.request({
-        method: "put",
-        url: play_gathering_api_url + "/play_sessions/" + playSessionUUID,
+        method: "post",
+        url: play_session_api_url + "/comment",
         data: formData,
         headers: { "Authorization": "Playcocola " + api_token }
       });
 
     console.log("HTTP response:", response);
     console.log("HTTP response code:", response.status);
-    sendDebugEvent("ThoughtsFormSend", "end");
+    sendDebugEvent("ThoughtsFormSend :: end");
     sendingThoughtsFinished();
   } catch(e) {
     console.log("Huston we have problem...:", e);
@@ -373,15 +395,15 @@ async function thoughtsFormSend() {
 }
 
 async function captureScreenStream() {
-  sendDebugEvent("CaptureScreenStream", "ini");
+  sendDebugEvent("CaptureScreenStream :: ini");
   try {
     screenStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": true}});
     permissionScreenBlock.style.display = "none";
-    sendDebugEvent("CaptureScreenStream", "end");
+    sendDebugEvent("CaptureScreenStream :: end");
     checkScreenPermissionsAccepted();
     checkAllPermissionsAccepted();
   } catch (error) {
-    sendDebugEvent("CaptureScreenStream", "error");
+    sendDebugEvent("CaptureScreenStream :: error");
     permissionScreenCheck.checked = false;
     const errorMessage = "There was a problem trying to get permissions to record your screen.\n\nPlease try again.\n\nMaybe the permissions are block in the browser settings."
     console.error("On captureScreenStream()", error);
@@ -390,15 +412,15 @@ async function captureScreenStream() {
 }
 
 async function captureMicStream() {
-  sendDebugEvent("CaptureMicStream", "ini");
+  sendDebugEvent("CaptureMicStream :: ini");
   try {
     micStream = await navigator.mediaDevices.getUserMedia({ audio: {"echoCancellation": true}, video: false });
     permissionMicBlock.style.display = "none";
-    sendDebugEvent("CaptureMicStream", "end");
+    sendDebugEvent("CaptureMicStream :: end");
     checkScreenPermissionsAccepted();
     checkAllPermissionsAccepted();
   } catch (error) {
-    sendDebugEvent("CaptureMicStream", "error");
+    sendDebugEvent("CaptureMicStream :: error");
     permissionMicCheck.checked = false;
     const errorMessage = "There was a problem trying to get permissions to record your mic.\n\nPlease try again.\n\nMaybe the permissions are block in the browser settings."
     console.error("On captureMicStream()", error);
@@ -445,24 +467,21 @@ function refreshPage() {
   location.reload();
 }
 
-function sendDebugEvent(name, value = null) {
-  console.log("sendDebugEvent()", name, value);
-  const debug_session_api_url = getParam("debug_session_api_url");
-  const api_token = getParam("api_token");
-  const front_user_id = getParam("front_user_id");
+function sendDebugEvent(value) {
+  return;
+  console.log("sendDebugEvent()", value);
 
   let formData = new FormData();
-  formData.append("front_user_id", front_user_id);
-  formData.append("name", name);
+  formData.append("tag", "client-action");
   formData.append("value", value);
 
   axios.request({
     method: "post",
-    url: debug_session_api_url.replace("DEBUG_SESSION_UUID", debugSessionID),
+    url: play_session_api_url + "/event",
     data: formData,
     headers: { "Authorization": "Playcocola " + api_token }
   }).catch(function (error) {
-    console.error("On getPlaySessionInfo()", error);
+    console.error("On sendDebugEvent()", error);
   });
 }
 
@@ -484,11 +503,21 @@ function captureWindowErrors() {
   });
 }
 
+function iniAPIUrlsAndToken() {
+  play_gathering_api_url = getParam("play_gathering_api_url");
+  api_token = getParam("api_token");
+}
+
+function iniPlaySessionAPIUrl(url) {
+  play_session_api_url = url;
+}
+
 
 // Start
 captureWindowErrors();
 uploadProgressBarUpdate(0);
+iniAPIUrlsAndToken();
 getPlaySessionInfo();
 captureThoughtsFormSubmit();
 initDebugSessionId();
-sendDebugEvent("PageLoaded");
+// sendDebugEvent("PageLoaded");
