@@ -32,7 +32,7 @@ var play_gathering_api_url;
 var play_session_api_url;
 var api_token;
 
-var mimeType = "video/webm;codecs=vp8,opus";
+var mimeType = "video/webm;codecs=vp8";
 var mediaRecorder;
 var recordedChunks;
 
