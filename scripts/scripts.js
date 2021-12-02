@@ -32,7 +32,7 @@ var play_gathering_api_url;
 var play_session_api_url;
 var api_token;
 
-var mimeType = "video/webm; codecs=vp9";
+var mimeType = "video/webm; codecs=vp8";
 var mediaRecorder;
 
 var videoPartsMilliseconds = 60000; // 1 minute
