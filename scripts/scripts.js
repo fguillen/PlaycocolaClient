@@ -32,7 +32,7 @@ var play_gathering_api_url;
 var play_session_api_url;
 var api_token;
 
-var mimeType = "video/webm;codecs=vp8";
+var mimeType;
 var mediaRecorder;
 var recordedChunks;
 
@@ -51,6 +51,16 @@ thoughtsFormDiv.style.display = "none";
 thanksDiv.style.display = "none";
 errorDiv.style.display = "none";
 permissionForm.style.display = "none";
+
+function setMimeType(){
+  if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
+    mimeType = "video/webm;codecs=vp9";
+  } else {
+    mimeType = "video/webm;codecs=vp8";
+  }
+
+  console.log("Using mimeType: " + mimeType);
+}
 
 function startRecord() {
   buttonRecord.disabled = true;
@@ -550,6 +560,7 @@ function iniPlaySessionAPIUrl(url) {
 
 
 // Start
+setMimeType();
 captureWindowErrors();
 uploadProgressBarUpdate(0);
 iniAPIUrlsAndToken();
