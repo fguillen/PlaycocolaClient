@@ -26,7 +26,7 @@ const permissionMicCheck = document.getElementById("permission-mic-check");
 
 var screenStream;
 var micStream;
-var debugSessionID;
+var fullStream;
 
 var play_gathering_api_url;
 var play_session_api_url;
@@ -101,12 +101,12 @@ buttonStop.addEventListener("click", function () {
 });
 
 
-function startRecording(stream) {
+function startRecording() {
     sendDebugEvent("HandleRecord :: ini");
     startRecord();
-    mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
+    mediaRecorder = new MediaRecorder(fullStream, { mimeType: mimeType });
     App.stopped = false;
-    recordVideoChunk(stream);
+    recordVideoChunk();
 };
 
 function recordVideoChunk() {
@@ -124,6 +124,12 @@ function recordVideoChunk() {
     actualChunks = recordedChunks.splice(0, recordedChunks.length);
     const blob = new Blob(actualChunks, { type: mimeType });
     getSeekableBlob(blob, uploadVideoPart);
+
+    if(App.stopped){
+      fullStream.getTracks().forEach( track => track.stop() );
+      micStream.getTracks().forEach( track => track.stop() );
+      screenStream.getTracks().forEach( track => track.stop() );
+    }
   };
 
   mediaRecorder.start();
@@ -284,11 +290,11 @@ async function recordScreen() {
       tracks = [...screenStream.getVideoTracks()];
     }
 
-    const stream = new MediaStream(tracks);
+    fullStream = new MediaStream(tracks);
 
-    startRecording(stream)
+    startRecording()
 
-    videoElement.srcObject = stream;
+    videoElement.srcObject = fullStream;
     sendDebugEvent("recordScreen :: end");
 }
 
@@ -516,10 +522,6 @@ function sendDebugEvent(value) {
   });
 }
 
-function initDebugSessionId() {
-  debugSessionID = uuidv4();
-}
-
 // From: https://stackoverflow.com/a/2117523/316700
 function uuidv4() {
   return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
@@ -550,5 +552,4 @@ uploadProgressBarUpdate(0);
 iniAPIUrlsAndToken();
 getPlaySessionInfo();
 captureThoughtsFormSubmit();
-initDebugSessionId();
 // sendDebugEvent("PageLoaded");
