@@ -36,6 +36,7 @@ var mimeType = "video/webm; codecs=vp9";
 var mediaRecorder;
 
 var videoPartsMilliseconds = 60000; // 1 minute
+var sessionFinalized = false;
 
 
 buttonRecord.style.display = "none";
@@ -90,6 +91,7 @@ buttonStop.addEventListener("click", function () {
     stopRecord();
     App.shouldStop = true;
     App.stopped = true;
+    sessionFinalized = true;
     if(mediaRecorder.state == "recording")
       mediaRecorder.stop();
 });
@@ -310,8 +312,13 @@ async function uploadVideoPart(blob) {
 
     console.log("HTTP response:", response);
     console.log("HTTP response code:", response.status);
-    sendDebugEvent("uploadVideoPart :: end");
     progressBarDiv.style.display = "none";
+
+    if(sessionFinalized)
+      sendSignalSessionFinalized();
+
+    sendDebugEvent("uploadVideoPart :: end");
+
   } catch(e) {
     console.log("Error on uploadVideoPart()...:", e);
   }
@@ -380,8 +387,6 @@ async function thoughtsFormSend() {
   formData.append("user_comment", thoughtsForm.querySelector('[name="comment"]').value );
 
   try {
-    console.log("Start sending thoughts");
-
     let response =
       await axios.request({
         method: "post",
@@ -390,12 +395,29 @@ async function thoughtsFormSend() {
         headers: { "Authorization": "Playcocola " + api_token }
       });
 
-    console.log("HTTP response:", response);
-    console.log("HTTP response code:", response.status);
     sendDebugEvent("ThoughtsFormSend :: end");
     sendingThoughtsFinished();
-  } catch(e) {
-    console.log("Huston we have problem...:", e);
+  } catch(error) {
+    sendDebugEvent("ThoughtsFormSend :: error");
+    console.error("On ThoughtsFormSend()", error);
+  }
+}
+
+async function sendSignalSessionFinalized() {
+  sendDebugEvent("sendSignalSessionFinalized :: ini");
+
+  try {
+    let response =
+      await axios.request({
+        method: "post",
+        url: play_session_api_url + "/session_finalized",
+        headers: { "Authorization": "Playcocola " + api_token }
+      });
+
+    sendDebugEvent("sendSignalSessionFinalized :: end");
+  } catch(error) {
+    sendDebugEvent("sendSignalSessionFinalized :: error");
+    console.error("On sendSignalSessionFinalized()", error);
   }
 }
 
