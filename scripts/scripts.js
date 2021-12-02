@@ -37,6 +37,8 @@ var mediaRecorder;
 
 var videoPartsMilliseconds = 60000; // 1 minute
 var sessionFinalized = false;
+var uploadFinished = true;
+var thoughtsSent = false;
 
 
 buttonRecord.style.display = "none";
@@ -75,7 +77,9 @@ function stopRecord() {
 
 function sendingThoughtsFinished() {
   console.log("sendingThoughtsFinished()");
-  thanksDiv.style.display = "block";
+  thoughtsSent = true;
+  if(uploadFinished)
+    thanksDiv.style.display = "block";
 }
 
 const audioRecordConstraints = {
@@ -290,14 +294,13 @@ async function recordScreen() {
 
 async function uploadVideoPart(blob) {
   sendDebugEvent("uploadVideoPart :: ini");
+  progressBarDiv.style.display = "block";
+  uploadFinished = false;
 
   let formData = new FormData();
   formData.append("video_part", blob);
 
   try {
-    console.log("Start uploading");
-    progressBarDiv.style.display = "block";
-
     let response =
       await axios.request({
         method: "post",
@@ -309,18 +312,20 @@ async function uploadVideoPart(blob) {
           uploadProgressBarUpdate(p.loaded / p.total);
         }
       });
-
-    console.log("HTTP response:", response);
-    console.log("HTTP response code:", response.status);
+  } catch(error) {
+    sendDebugEvent("uploadVideoPart :: error");
+    console.error("On uploadVideoPart()", error);
+  } finally {
     progressBarDiv.style.display = "none";
+    uploadFinished = true;
 
-    if(sessionFinalized)
+    if(sessionFinalized) {
       sendSignalSessionFinalized();
+      if(thoughtsSent)
+        thanksDiv.style.display = "block";
+    }
 
     sendDebugEvent("uploadVideoPart :: end");
-
-  } catch(e) {
-    console.log("Error on uploadVideoPart()...:", e);
   }
 }
 
