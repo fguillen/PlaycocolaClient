@@ -56,7 +56,7 @@ function setMimeType(){
   if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
     mimeType = "video/webm;codecs=vp9";
   } else {
-    mimeType = "video/webm;codecs=vp8";
+    mimeType = "video/webm";
   }
 
   console.log("Using mimeType: " + mimeType);
