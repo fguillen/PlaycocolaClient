@@ -32,11 +32,11 @@ var play_gathering_api_url;
 var play_session_api_url;
 var api_token;
 
-var mimeType = "video/webm; codecs=vp8";
+var mimeType = "video/webm;codecs=vp8,opus";
 var mediaRecorder;
 var recordedChunks;
 
-var videoPartsMilliseconds = 5000; // 1 minute
+var videoPartsMilliseconds = 60_000; // 1 minute
 var sessionFinalized = false;
 var uploadFinished = true;
 var thoughtsSent = false;
