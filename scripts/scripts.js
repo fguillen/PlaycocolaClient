@@ -34,8 +34,9 @@ var api_token;
 
 var mimeType = "video/webm; codecs=vp8";
 var mediaRecorder;
+var recordedChunks;
 
-var videoPartsMilliseconds = 60000; // 1 minute
+var videoPartsMilliseconds = 5000; // 1 minute
 var sessionFinalized = false;
 var uploadFinished = true;
 var thoughtsSent = false;
@@ -82,10 +83,6 @@ function sendingThoughtsFinished() {
     thanksDiv.style.display = "block";
 }
 
-const audioRecordConstraints = {
-    echoCancellation: true
-}
-
 buttonRecord.addEventListener("click", function () {
   recordScreen();
 });
@@ -106,37 +103,38 @@ function startRecording() {
     startRecord();
     mediaRecorder = new MediaRecorder(fullStream, { mimeType: mimeType });
     App.stopped = false;
+
+    recordedChunks = [];
+
+    mediaRecorder.ondataavailable = function (e) {
+      console.log("ondataavailable", e.data.size);
+      recordedChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = function () {
+      sendDebugEvent("recordVideoChunk :: end");
+      actualChunks = recordedChunks.splice(0, recordedChunks.length);
+      const blob = new Blob(actualChunks, { type: mimeType });
+      // getSeekableBlob(blob, uploadVideoPart);
+      uploadVideoPart(blob);
+
+      if(App.stopped){
+        if(fullStream != null)
+          fullStream.getTracks().forEach( track => track.stop() );
+
+        if(micStream != null)
+          micStream.getTracks().forEach( track => track.stop() );
+
+        if(screenStream != null)
+          screenStream.getTracks().forEach( track => track.stop() );
+      }
+    };
+
     recordVideoChunk();
 };
 
 function recordVideoChunk() {
   sendDebugEvent("recordVideoChunk :: start");
-
-  let recordedChunks = [];
-
-  mediaRecorder.ondataavailable = function (e) {
-    console.log("ondataavailable", e.data.size);
-    recordedChunks.push(e.data);
-  };
-
-  mediaRecorder.onstop = function () {
-    sendDebugEvent("recordVideoChunk :: end");
-    actualChunks = recordedChunks.splice(0, recordedChunks.length);
-    const blob = new Blob(actualChunks, { type: mimeType });
-    getSeekableBlob(blob, uploadVideoPart);
-
-    if(App.stopped){
-      if(fullStream != null)
-        fullStream.getTracks().forEach( track => track.stop() );
-
-      if(micStream != null)
-        micStream.getTracks().forEach( track => track.stop() );
-
-      if(screenStream != null)
-        screenStream.getTracks().forEach( track => track.stop() );
-    }
-  };
-
   mediaRecorder.start();
 
   setTimeout(function() {
@@ -220,32 +218,32 @@ function showPermissionForm() {
   permissionForm.style.display = "block";
 }
 
-function getSeekableBlob(inputBlob, callback) {
-  sendDebugEvent("GetSeekableBlob : ini");
-  // EBML.js copyrights goes to: https://github.com/legokichi/ts-ebml
-  if (typeof EBML === 'undefined') {
-      throw new Error('Please link: https://cdn.webrtc-experiment.com/EBML.js');
-  }
-  var reader = new EBML.Reader();
-  var decoder = new EBML.Decoder();
-  var tools = EBML.tools;
-  var fileReader = new FileReader();
-  fileReader.onload = function(e) {
-      var ebmlElms = decoder.decode(this.result);
-      ebmlElms.forEach(function(element) {
-          reader.read(element);
-      });
-      reader.stop();
-      var refinedMetadataBuf = tools.makeMetadataSeekable(reader.metadatas, reader.duration, reader.cues);
-      var body = this.result.slice(reader.metadataSize);
-      var newBlob = new Blob([refinedMetadataBuf, body], {
-          type: 'video/webm'
-      });
-      sendDebugEvent("GetSeekableBlob :: end");
-      callback(newBlob);
-  };
-  fileReader.readAsArrayBuffer(inputBlob);
-}
+// function getSeekableBlob(inputBlob, callback) {
+//   sendDebugEvent("GetSeekableBlob : ini");
+//   // EBML.js copyrights goes to: https://github.com/legokichi/ts-ebml
+//   if (typeof EBML === 'undefined') {
+//       throw new Error('Please link: https://cdn.webrtc-experiment.com/EBML.js');
+//   }
+//   var reader = new EBML.Reader();
+//   var decoder = new EBML.Decoder();
+//   var tools = EBML.tools;
+//   var fileReader = new FileReader();
+//   fileReader.onload = function(e) {
+//       var ebmlElms = decoder.decode(this.result);
+//       ebmlElms.forEach(function(element) {
+//           reader.read(element);
+//       });
+//       reader.stop();
+//       var refinedMetadataBuf = tools.makeMetadataSeekable(reader.metadatas, reader.duration, reader.cues);
+//       var body = this.result.slice(reader.metadataSize);
+//       var newBlob = new Blob([refinedMetadataBuf, body], {
+//           type: 'video/webm'
+//       });
+//       sendDebugEvent("GetSeekableBlob :: end");
+//       callback(newBlob);
+//   };
+//   fileReader.readAsArrayBuffer(inputBlob);
+// }
 
 async function recordScreen() {
     sendDebugEvent("recordScreen :: ini");
@@ -440,7 +438,7 @@ async function sendSignalSessionFinalized() {
 async function captureScreenStream() {
   sendDebugEvent("CaptureScreenStream :: ini");
   try {
-    screenStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": true}});
+    screenStream = await navigator.mediaDevices.getDisplayMedia({video: {cursor: "motion"}, audio: {"echoCancellation": false}});
     permissionScreenBlock.style.display = "none";
     sendDebugEvent("CaptureScreenStream :: end");
     checkScreenPermissionsAccepted();
