@@ -126,9 +126,14 @@ function recordVideoChunk() {
     getSeekableBlob(blob, uploadVideoPart);
 
     if(App.stopped){
-      fullStream.getTracks().forEach( track => track.stop() );
-      micStream.getTracks().forEach( track => track.stop() );
-      screenStream.getTracks().forEach( track => track.stop() );
+      if(fullStream != null)
+        fullStream.getTracks().forEach( track => track.stop() );
+
+      if(micStream != null)
+        micStream.getTracks().forEach( track => track.stop() );
+
+      if(screenStream != null)
+        screenStream.getTracks().forEach( track => track.stop() );
     }
   };
 
