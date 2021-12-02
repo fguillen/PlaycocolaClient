@@ -32,6 +32,11 @@ var play_gathering_api_url;
 var play_session_api_url;
 var api_token;
 
+var mimeType = "video/webm; codecs=vp9";
+var mediaRecorder;
+
+var videoPartsMilliseconds = 60000; // 1 minute
+
 
 buttonRecord.style.display = "none";
 buttonStop.style.display = "none";
@@ -54,21 +59,22 @@ function stopRecord() {
   buttonStop.style.display = "none";
   progressBarDiv.style.display = "block";
   thoughtsFormDiv.style.display = "block";
+  videoElement.style.display = "none";
 }
 
-function uploadFinished(_playSessionUUID) {
-  progressBarDiv.style.display = "none";
-  thanksDiv.style.display = "block";
-  uploadIsFinished = true;
-  playSessionUUID = _playSessionUUID;
+// function uploadFinished() {
+//   progressBarDiv.style.display = "none";
+//   thanksDiv.style.display = "block";
+//   uploadIsFinished = true;
 
-  if(thoughtsFormIsReady) {
-    thoughtsFormSend();
-  }
-}
+//   if(thoughtsFormIsReady) {
+//     thoughtsFormSend();
+//   }
+// }
 
 function sendingThoughtsFinished() {
   console.log("sendingThoughtsFinished()");
+  thanksDiv.style.display = "block";
 }
 
 const audioRecordConstraints = {
@@ -81,67 +87,69 @@ buttonRecord.addEventListener("click", function () {
 
 buttonStop.addEventListener("click", function () {
     sendDebugEvent("buttonStop Clicked");
+    stopRecord();
     App.shouldStop = true;
     App.stopped = true;
-    mediaRecorder.stop();
+    if(mediaRecorder.state == "recording")
+      mediaRecorder.stop();
 });
 
-var dataSize = 0;
-var lastDataSizeDebugEvent = 0;
-var mediaRecorder;
-const handleRecord = function ({stream, mimeType}) {
+
+function startRecording(stream) {
     sendDebugEvent("HandleRecord :: ini");
     startRecord();
-    let recordedChunks = [];
+    mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
     App.stopped = false;
-    mediaRecorder = new MediaRecorder(stream);
-
-    mediaRecorder.ondataavailable = function (e) {
-      console.log("ondataavailable", e.data.size);
-      recordedChunks.push(e.data);
-      // getSeekableBlob(new Blob([e.data], { type: mimeType }), uploadVideoPart);
-      uploadVideoPart(e.data);
-    };
-
-    mediaRecorder.onstop = function () {
-      sendDebugEvent("HandleRecord :: end");
-      const blob = new Blob(recordedChunks, { type: mimeType });
-      stopRecord();
-      recordedChunks = [];
-
-      getSeekableBlob(blob, finalBlob)
-      // Stop tracks, remove the red icon
-      stream.getTracks().forEach( track => track.stop() );
-    };
-
-    mediaRecorder.start(1000); // 1 second
+    recordVideoChunk(stream);
 };
 
-function recordVideoChunk(stream)
-{
+function recordVideoChunk() {
+  sendDebugEvent("recordVideoChunk :: start");
 
+  let recordedChunks = [];
+
+  mediaRecorder.ondataavailable = function (e) {
+    console.log("ondataavailable", e.data.size);
+    recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = function () {
+    sendDebugEvent("recordVideoChunk :: end");
+    actualChunks = recordedChunks.splice(0, recordedChunks.length);
+    const blob = new Blob(actualChunks, { type: mimeType });
+    getSeekableBlob(blob, uploadVideoPart);
+  };
+
+  mediaRecorder.start();
+
+  setTimeout(function() {
+    if(mediaRecorder.state == "recording")
+      mediaRecorder.stop();
+
+    if(!App.stopped)
+      recordVideoChunk();
+  }, videoPartsMilliseconds);
 }
 
-function finalBlob(blob) {
-  sendDebugEvent("FinalBlob :: ini");
-  const filename = "MyPlayTestingSession_" + Date.now();
-  let videoUrl = URL.createObjectURL(blob);
-  linkDownload.href = videoUrl;
-  linkDownload.download = `${filename || "recording"}.webm`;
-  linkDownload.style.display = "inline-block";
+// function finalBlob(blob) {
+//   sendDebugEvent("FinalBlob :: ini");
+//   const filename = "MyPlayTestingSession_" + Date.now();
+//   let videoUrl = URL.createObjectURL(blob);
+//   linkDownload.href = videoUrl;
+//   linkDownload.download = `${filename || "recording"}.webm`;
+//   linkDownload.style.display = "inline-block";
 
-  videoElement.srcObject = null;
-  videoElement.src = videoUrl;
-  videoElement.load();
-  videoElement.onloadeddata = function() {
-    console.log("video.onloadeddata()");
-    videoElement.controls = true;
-    // videoElement.stop();
-  }
+//   videoElement.srcObject = null;
+//   videoElement.src = videoUrl;
+//   videoElement.load();
+//   videoElement.onloadeddata = function() {
+//     console.log("video.onloadeddata()");
+//     videoElement.controls = true;
+//   }
 
-  sendDebugEvent("FinalBlob :: end");
-  uploadFile(blob);
-}
+//   sendDebugEvent("FinalBlob :: end");
+//   uploadFile(blob);
+// }
 
 // From: https://stackoverflow.com/a/43378874/316700
 function getParam(param){
@@ -272,7 +280,7 @@ async function recordScreen() {
 
     const stream = new MediaStream(tracks);
 
-    handleRecord({stream, mimeType})
+    startRecording(stream)
 
     videoElement.srcObject = stream;
     sendDebugEvent("recordScreen :: end");
@@ -286,6 +294,7 @@ async function uploadVideoPart(blob) {
 
   try {
     console.log("Start uploading");
+    progressBarDiv.style.display = "block";
 
     let response =
       await axios.request({
@@ -308,35 +317,35 @@ async function uploadVideoPart(blob) {
   }
 }
 
-async function uploadFile(blob) {
-  sendDebugEvent("UploadFile :: ini");
+// async function uploadFile(blob) {
+//   sendDebugEvent("UploadFile :: ini");
 
-  let formData = new FormData();
-  formData.append("video", blob);
+//   let formData = new FormData();
+//   formData.append("video", blob);
 
-  try {
-    console.log("Start uploading");
+//   try {
+//     console.log("Start uploading");
 
-    let response =
-      await axios.request({
-        method: "post",
-        url: play_session_api_url + "/video",
-        data: formData,
-        headers: { "Authorization": "Playcocola " + api_token },
-        onUploadProgress: (p) => {
-          console.log("progress: ", p);
-          uploadProgressBarUpdate(p.loaded / p.total);
-        }
-      });
+//     let response =
+//       await axios.request({
+//         method: "post",
+//         url: play_session_api_url + "/video",
+//         data: formData,
+//         headers: { "Authorization": "Playcocola " + api_token },
+//         onUploadProgress: (p) => {
+//           console.log("progress: ", p);
+//           uploadProgressBarUpdate(p.loaded / p.total);
+//         }
+//       });
 
-    console.log("HTTP response:", response);
-    console.log("HTTP response code:", response.status);
-    sendDebugEvent("UploadFile :: end");
-    uploadFinished(response.data.uuid);
-  } catch(e) {
-    console.log("Error on uploadFile...:", e);
-  }
-}
+//     console.log("HTTP response:", response);
+//     console.log("HTTP response code:", response.status);
+//     sendDebugEvent("UploadFile :: end");
+//     uploadFinished(response.data.uuid);
+//   } catch(e) {
+//     console.log("Error on uploadFile...:", e);
+//   }
+// }
 
 var lastUploadPercentageDebugEvent = 0;
 function uploadProgressBarUpdate(percentage) {
@@ -358,12 +367,8 @@ function captureThoughtsFormSubmit() {
 }
 
 function thoughtsFormReady() {
-  thoughtsFormIsReady = true;
   thoughtsFormDiv.style.display = "none";
-
-  if(uploadIsFinished) {
-    thoughtsFormSend();
-  }
+  thoughtsFormSend();
 }
 
 async function thoughtsFormSend() {
@@ -468,7 +473,6 @@ function refreshPage() {
 }
 
 function sendDebugEvent(value) {
-  return;
   console.log("sendDebugEvent()", value);
 
   let formData = new FormData();
