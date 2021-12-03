@@ -114,45 +114,46 @@ function startRecording() {
     startRecord();
     App.stopped = false;
 
-    mediaRecorder = new MediaRecorder(fullStream, { mimeType: mimeType });
-
-    recordedChunks = [];
-
-    mediaRecorder.onstart = function () {
-      console.log("mediaRecorder.onstart()");
-    }
-
-    mediaRecorder.ondataavailable = function (e) {
-      console.log("mediaRecorder.ondataavailable()");
-      console.log("ondataavailable", e.data.size);
-      recordedChunks.push(e.data);
-    };
-
-    mediaRecorder.onstop = function () {
-      console.log("mediaRecorder.onstop()");
-      sendDebugEvent("recordVideoChunk :: end");
-      actualChunks = recordedChunks.splice(0, recordedChunks.length);
-      const blob = new Blob(actualChunks, { type: mimeType });
-      // getSeekableBlob(blob, uploadVideoPart);
-      uploadVideoPart(blob);
-
-      if(App.stopped){
-        if(fullStream != null)
-          fullStream.getTracks().forEach( track => track.stop() );
-
-        if(micStream != null)
-          micStream.getTracks().forEach( track => track.stop() );
-
-        if(screenStream != null)
-          screenStream.getTracks().forEach( track => track.stop() );
-      }
-    };
-
     recordVideoChunk();
 };
 
 function recordVideoChunk() {
   sendDebugEvent("recordVideoChunk :: start");
+
+  mediaRecorder = new MediaRecorder(fullStream, { mimeType: mimeType });
+
+  recordedChunks = [];
+
+  mediaRecorder.onstart = function () {
+    console.log("mediaRecorder.onstart()");
+  }
+
+  mediaRecorder.ondataavailable = function (e) {
+    console.log("mediaRecorder.ondataavailable()");
+    console.log("ondataavailable", e.data.size);
+    recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = function () {
+    console.log("mediaRecorder.onstop()");
+    sendDebugEvent("recordVideoChunk :: end");
+    actualChunks = recordedChunks.splice(0, recordedChunks.length);
+    const blob = new Blob(actualChunks, { type: mimeType });
+    // getSeekableBlob(blob, uploadVideoPart);
+    uploadVideoPart(blob);
+
+    if(App.stopped){
+      if(fullStream != null)
+        fullStream.getTracks().forEach( track => track.stop() );
+
+      if(micStream != null)
+        micStream.getTracks().forEach( track => track.stop() );
+
+      if(screenStream != null)
+        screenStream.getTracks().forEach( track => track.stop() );
+    }
+  };
+
   mediaRecorder.start();
 
   setTimeout(function() {
