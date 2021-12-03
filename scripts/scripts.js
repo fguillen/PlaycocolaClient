@@ -23,6 +23,7 @@ const permissionScreenBlock = document.getElementById("permission-screen-block")
 const permissionMicBlock = document.getElementById("permission-mic-block");
 const permissionScreenCheck = document.getElementById("permission-screen-check");
 const permissionMicCheck = document.getElementById("permission-mic-check");
+const downloadLinksDiv = document.getElementById("download-links");
 
 var screenStream;
 var micStream;
@@ -36,7 +37,7 @@ var mimeType;
 var mediaRecorder;
 var recordedChunks;
 
-var videoPartsMilliseconds = 60_000; // 1 minute
+var videoPartsMilliseconds = 5_000; // 1 minute
 var sessionFinalized = false;
 var uploadFinished = true;
 var thoughtsSent = false;
@@ -111,17 +112,24 @@ buttonStop.addEventListener("click", function () {
 function startRecording() {
     sendDebugEvent("HandleRecord :: ini");
     startRecord();
-    mediaRecorder = new MediaRecorder(fullStream, { mimeType: mimeType });
     App.stopped = false;
+
+    mediaRecorder = new MediaRecorder(fullStream, { mimeType: mimeType });
 
     recordedChunks = [];
 
+    mediaRecorder.onstart = function () {
+      console.log("mediaRecorder.onstart()");
+    }
+
     mediaRecorder.ondataavailable = function (e) {
+      console.log("mediaRecorder.ondataavailable()");
       console.log("ondataavailable", e.data.size);
       recordedChunks.push(e.data);
     };
 
     mediaRecorder.onstop = function () {
+      console.log("mediaRecorder.onstop()");
       sendDebugEvent("recordVideoChunk :: end");
       actualChunks = recordedChunks.splice(0, recordedChunks.length);
       const blob = new Blob(actualChunks, { type: mimeType });
@@ -154,6 +162,20 @@ function recordVideoChunk() {
     if(!App.stopped)
       recordVideoChunk();
   }, videoPartsMilliseconds);
+}
+
+function createDownloadLink(blob, filename) {
+  console.log("createDownloadLink(" + filename + ")");
+
+  const copyBlob = new Blob([blob], {type: blob.type});
+  const videoUrl = URL.createObjectURL(copyBlob);
+
+  const link = document.createElement('a');
+  link.setAttribute("href", videoUrl);
+  link.setAttribute("download", filename);
+  link.setAttribute("target", "_blank");
+  link.innerText = filename;
+  downloadLinksDiv.appendChild(link);
 }
 
 // function finalBlob(blob) {
@@ -316,8 +338,11 @@ async function uploadVideoPart(blob) {
   progressBarDiv.style.display = "block";
   uploadFinished = false;
 
+  const filename = "video_part_" + Date.now() + ".webm";
+  createDownloadLink(blob, filename);
+
   const formData = new FormData();
-  formData.append("video_part", blob, "video_part_" + Date.now() + ".webm");
+  formData.append("video_part", blob, filename);
 
   try {
     let response =

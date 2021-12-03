@@ -211,3 +211,9 @@
 .eg-how-work-text > p {
   margin-left: 100px;
 }
+
+
+#download-links a{
+  color: white;
+  display: block;
+}
