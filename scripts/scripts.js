@@ -54,8 +54,8 @@ errorDiv.style.display = "none";
 permissionForm.style.display = "none";
 
 function setMimeType(){
-  if(MediaRecorder.isTypeSupported("video/webm;codecs=vp8")){
-    mimeType = "video/webm;codecs=vp8";
+  if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
+    mimeType = "video/webm;codecs=vp9";
   } else {
     mimeType = "video/webm";
   }
