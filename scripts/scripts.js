@@ -88,7 +88,6 @@ function stopRecord() {
 // }
 
 function sendingThoughtsFinished() {
-  console.log("sendingThoughtsFinished()");
   thoughtsSent = true;
   if(uploadFinished)
     thanksDiv.style.display = "block";
@@ -128,17 +127,17 @@ function recordVideoChunk() {
   recordedChunks = [];
 
   mediaRecorder.onstart = function () {
-    console.log("mediaRecorder.onstart()");
+    // console.log("mediaRecorder.onstart()");
   }
 
   mediaRecorder.ondataavailable = function (e) {
-    console.log("mediaRecorder.ondataavailable()");
-    console.log("ondataavailable", e.data.size);
+    // console.log("mediaRecorder.ondataavailable()");
+    // console.log("ondataavailable", e.data.size);
     recordedChunks.push(e.data);
   };
 
   mediaRecorder.onstop = function () {
-    console.log("mediaRecorder.onstop()");
+    // console.log("mediaRecorder.onstop()");
     sendDebugEvent("recordVideoChunk :: end");
     actualChunks = recordedChunks.splice(0, recordedChunks.length);
     const blob = new Blob(actualChunks, { type: mimeType });
@@ -168,19 +167,19 @@ function recordVideoChunk() {
   }, videoPartsMilliseconds);
 }
 
-function createDownloadLink(blob, filename) {
-  console.log("createDownloadLink(" + filename + ")");
+// function createDownloadLink(blob, filename) {
+//   console.log("createDownloadLink(" + filename + ")");
 
-  const copyBlob = new Blob([blob], {type: blob.type});
-  const videoUrl = URL.createObjectURL(copyBlob);
+//   const copyBlob = new Blob([blob], {type: blob.type});
+//   const videoUrl = URL.createObjectURL(copyBlob);
 
-  const link = document.createElement('a');
-  link.setAttribute("href", videoUrl);
-  link.setAttribute("download", filename);
-  link.setAttribute("target", "_blank");
-  link.innerText = filename;
-  downloadLinksDiv.appendChild(link);
-}
+//   const link = document.createElement('a');
+//   link.setAttribute("href", videoUrl);
+//   link.setAttribute("download", filename);
+//   link.setAttribute("target", "_blank");
+//   link.innerText = filename;
+//   downloadLinksDiv.appendChild(link);
+// }
 
 // function finalBlob(blob) {
 //   sendDebugEvent("FinalBlob :: ini");
@@ -244,7 +243,7 @@ function makeAllLinksTargetBlank(element) {
 }
 
 function showPlaySessionInfo(info) {
-  console.log("showPlaySessionInfo", info);
+  // console.log("showPlaySessionInfo", info);
   playGatheringTitle.textContent = info.title;
   playGatheringDescription.innerHTML = marked(info.description);
   makeAllLinksTargetBlank(playGatheringDescription);
@@ -318,7 +317,7 @@ async function recordScreen() {
       userAudio.connect(audioDestination);
     }
 
-    console.log("audioDestination.stream.getTracks():", audioDestination.stream.getTracks());
+    // console.log("audioDestination.stream.getTracks():", audioDestination.stream.getTracks());
 
     var tracks;
 
@@ -343,7 +342,7 @@ async function uploadVideoPart(blob) {
   uploadFinished = false;
 
   const filename = "video_part_" + Date.now() + ".webm";
-  createDownloadLink(blob, filename);
+  // createDownloadLink(blob, filename);
 
   const formData = new FormData();
   formData.append("video_part", blob, filename);
@@ -356,7 +355,7 @@ async function uploadVideoPart(blob) {
         data: formData,
         headers: { "Authorization": "Playcocola " + api_token },
         onUploadProgress: (p) => {
-          console.log("progress: ", p);
+          // console.log("progress: ", p);
           uploadProgressBarUpdate(p.loaded / p.total);
         }
       });
