@@ -316,8 +316,8 @@ async function uploadVideoPart(blob) {
   progressBarDiv.style.display = "block";
   uploadFinished = false;
 
-  let formData = new FormData();
-  formData.append("video_part", blob);
+  const formData = new FormData();
+  formData.append("video_part", blob, "video_part_" + Date.now());
 
   try {
     let response =
