@@ -117,6 +117,9 @@ function startRecording() {
     recordVideoChunk();
 };
 
+// Before try to refactor this be careful that
+// race conditions can be generated in the events (specially in Chrome)
+// The commit fixing this whs this: cd52e2b
 function recordVideoChunk() {
   sendDebugEvent("recordVideoChunk :: start");
 
