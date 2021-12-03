@@ -37,7 +37,7 @@ var mimeType;
 var mediaRecorder;
 var recordedChunks;
 
-var videoPartsMilliseconds = 5_000; // 1 minute
+var videoPartsMilliseconds = 60_000; // 1 minute
 var sessionFinalized = false;
 var uploadFinished = true;
 var thoughtsSent = false;
