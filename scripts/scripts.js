@@ -53,8 +53,8 @@ errorDiv.style.display = "none";
 permissionForm.style.display = "none";
 
 function setMimeType(){
-  if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
-    mimeType = "video/webm;codecs=vp9";
+  if(MediaRecorder.isTypeSupported("video/webm;codecs=vp8")){
+    mimeType = "video/webm;codecs=vp8";
   } else {
     mimeType = "video/webm";
   }
@@ -317,7 +317,7 @@ async function uploadVideoPart(blob) {
   uploadFinished = false;
 
   const formData = new FormData();
-  formData.append("video_part", blob, "video_part_" + Date.now());
+  formData.append("video_part", blob, "video_part_" + Date.now() + ".webm");
 
   try {
     let response =
