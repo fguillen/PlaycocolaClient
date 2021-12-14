@@ -77,22 +77,31 @@ function startRecord() {
 }
 
 function pauseRecord() {
+  sendDebugEvent("pauseRecord");
   buttonPause.style.display = "none";
   buttonContinue.style.display = "inline-block";
   isPaused = true;
+
+  if(mediaRecorder.state == "recording")
+    mediaRecorder.stop();
 }
 
 function continueRecord() {
+  sendDebugEvent("continueRecord");
   buttonContinue.style.display = "none";
   buttonPause.style.display = "inline-block";
   isPaused = false;
+
+  recordVideoChunk();
 }
 
 function stopRecord() {
   buttonStop.style.display = "none";
-  progressBarDiv.style.display = "block";
+  // progressBarDiv.style.display = "block";
   thoughtsFormDiv.style.display = "block";
   videoElement.style.display = "none";
+  buttonPause.style.display = "none";
+  buttonContinue.style.display = "none";
 }
 
 // function uploadFinished() {
@@ -187,7 +196,7 @@ function recordVideoChunk() {
     if(mediaRecorder.state == "recording")
       mediaRecorder.stop();
 
-    if(!App.stopped)
+    if(!App.stopped && !isPaused)
       recordVideoChunk();
   }, videoPartsMilliseconds);
 }
