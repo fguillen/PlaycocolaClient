@@ -11,6 +11,8 @@ const videoElement = document.getElementById("video");
 const linkDownload = document.getElementById("link-download");
 const buttonRecord = document.getElementById("button-record");
 const buttonStop = document.getElementById("button-stop");
+const buttonPause = document.getElementById("button-pause");
+const buttonContinue = document.getElementById("button-continue");
 const progressBarDiv = document.getElementById("upload-progress");
 const playGatheringTitle = document.getElementById("play-gathering-title");
 const playGatheringDescription = document.getElementById("play-gathering-description");
@@ -41,10 +43,13 @@ var videoPartsMilliseconds = 60_000; // 1 minute
 var sessionFinalized = false;
 var uploadFinished = true;
 var thoughtsSent = false;
+var isPaused = false;
 
 
 buttonRecord.style.display = "none";
 buttonStop.style.display = "none";
+buttonPause.style.display = "none";
+buttonContinue.style.display = "none";
 videoElement.style.display = "none";
 linkDownload.style.display = "none";
 progressBarDiv.style.display = "none";
@@ -66,8 +71,21 @@ function setMimeType(){
 function startRecord() {
   buttonRecord.disabled = true;
   buttonRecord.style.display = "none";
+  buttonPause.style.display = "inline-block";
   buttonStop.style.display = "inline-block";
   videoElement.style.display = "inline-block";
+}
+
+function pauseRecord() {
+  buttonPause.style.display = "none";
+  buttonContinue.style.display = "inline-block";
+  isPaused = true;
+}
+
+function continueRecord() {
+  buttonContinue.style.display = "none";
+  buttonPause.style.display = "inline-block";
+  isPaused = false;
 }
 
 function stopRecord() {
@@ -107,6 +125,13 @@ buttonStop.addEventListener("click", function () {
       mediaRecorder.stop();
 });
 
+buttonPause.addEventListener("click", function () {
+  pauseRecord();
+});
+
+buttonContinue.addEventListener("click", function () {
+  continueRecord();
+});
 
 function startRecording() {
     sendDebugEvent("HandleRecord :: ini");
