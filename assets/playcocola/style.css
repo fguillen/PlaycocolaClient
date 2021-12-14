@@ -113,7 +113,7 @@
 }
 
 
-#video {
+#video-element {
   box-shadow: 11px 3px 12px 3px rgba(215,28,166,0.35);
 -webkit-box-shadow: 11px 3px 12px 3px rgba(215,28,166,0.35);
 -moz-box-shadow: 11px 3px 12px 3px rgba(215,28,166,0.35);
@@ -239,4 +239,8 @@
 		transform: scale(0.95);
 		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
 	}
+}
+
+#timer {
+  font-size: 4em;
 }

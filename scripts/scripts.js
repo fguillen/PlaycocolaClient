@@ -26,6 +26,10 @@ const permissionMicBlock = document.getElementById("permission-mic-block");
 const permissionScreenCheck = document.getElementById("permission-screen-check");
 const permissionMicCheck = document.getElementById("permission-mic-check");
 const downloadLinksDiv = document.getElementById("download-links");
+const timerElement = document.getElementById("timer");
+
+var initTime = 0;
+var initTimeAt = null;
 
 var screenStream;
 var micStream;
@@ -57,6 +61,7 @@ thoughtsFormDiv.style.display = "none";
 thanksDiv.style.display = "none";
 errorDiv.style.display = "none";
 permissionForm.style.display = "none";
+timerElement.style.display = "none";
 
 function setMimeType(){
   if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
@@ -74,6 +79,10 @@ function startRecord() {
   buttonPause.style.display = "inline-block";
   buttonStop.style.display = "inline-block";
   videoElement.style.display = "inline-block";
+  timerElement.style.display = "inline-block";
+  initTimeAt = new Date().getTime();
+
+  renderTimer();
 }
 
 function pauseRecord() {
@@ -81,6 +90,7 @@ function pauseRecord() {
   buttonPause.style.display = "none";
   buttonContinue.style.display = "inline-block";
   videoElement.pause();
+  initTime += ((new Date().getTime()) - initTimeAt);
   isPaused = true;
 
   if(mediaRecorder.state == "recording")
@@ -93,6 +103,8 @@ function continueRecord() {
   buttonPause.style.display = "inline-block";
   videoElement.play();
   isPaused = false;
+  initTimeAt = new Date().getTime();
+  renderTimer();
 
   recordVideoChunk();
 }
@@ -104,6 +116,7 @@ function stopRecord() {
   videoElement.style.display = "none";
   buttonPause.style.display = "none";
   buttonContinue.style.display = "none";
+  timerElement.style.display = "none";
 }
 
 // function uploadFinished() {
@@ -621,6 +634,22 @@ function iniAPIUrlsAndToken() {
 function iniPlaySessionAPIUrl(url) {
   play_session_api_url = url;
 }
+
+function renderTimer() {
+  if(isPaused || App.stopped)
+    return;
+
+  const time = initTime + (new Date().getTime() - initTimeAt);
+  const minutes = Math.floor(time / 1000 / 60);
+  const seconds = Math.floor((time / 1000) % 60);
+  const timeString = "" + minutes.toString().padStart(2, "0") + ":" + seconds.toString().padStart(2, "0");
+  console.log("timeString", timeString);
+  timerElement.innerHTML = timeString;
+
+  setTimeout(renderTimer, 1000);
+}
+
+
 
 
 // Start
