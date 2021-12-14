@@ -7,7 +7,7 @@ var thoughtsFormIsReady = false;
 var uploadIsFinished = false;
 var playSessionUUID = null;
 
-const videoElement = document.getElementById("video");
+const videoElement = document.getElementById("video-element");
 const linkDownload = document.getElementById("link-download");
 const buttonRecord = document.getElementById("button-record");
 const buttonStop = document.getElementById("button-stop");
@@ -80,6 +80,7 @@ function pauseRecord() {
   sendDebugEvent("pauseRecord");
   buttonPause.style.display = "none";
   buttonContinue.style.display = "inline-block";
+  videoElement.pause();
   isPaused = true;
 
   if(mediaRecorder.state == "recording")
@@ -90,6 +91,7 @@ function continueRecord() {
   sendDebugEvent("continueRecord");
   buttonContinue.style.display = "none";
   buttonPause.style.display = "inline-block";
+  videoElement.play();
   isPaused = false;
 
   recordVideoChunk();
