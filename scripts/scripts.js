@@ -640,10 +640,14 @@ function renderTimer() {
     return;
 
   const time = initTime + (new Date().getTime() - initTimeAt);
-  const minutes = Math.floor(time / 1000 / 60);
+  const hours = Math.floor(time / 1000 / 60 / 60);
+  const minutes = Math.floor((time / 1000 / 60) % 60);
   const seconds = Math.floor((time / 1000) % 60);
-  const timeString = "" + minutes.toString().padStart(2, "0") + ":" + seconds.toString().padStart(2, "0");
-  console.log("timeString", timeString);
+  var timeString =  minutes.toString().padStart(2, "0") + ":" + seconds.toString().padStart(2, "0");
+
+  if(hours > 0)
+    timeString = hours.toString().padStart(2, "0") + ":" + timeString;
+
   timerElement.innerHTML = timeString;
 
   setTimeout(renderTimer, 1000);
