@@ -2,6 +2,7 @@ var App = new Object();
 
 App.shouldStop = false;
 App.stopped = false;
+App.ongoing = false;
 
 var thoughtsFormIsReady = false;
 var uploadIsFinished = false;
@@ -161,6 +162,7 @@ function startRecording() {
     sendDebugEvent("HandleRecord :: ini");
     startRecord();
     App.stopped = false;
+    App.ongoing = true;
 
     recordVideoChunk();
 };
@@ -516,6 +518,7 @@ async function sendSignalSessionFinalized() {
       });
 
     sendDebugEvent("sendSignalSessionFinalized :: end");
+    App.ongoing = false;
   } catch(error) {
     sendDebugEvent("sendSignalSessionFinalized :: error");
     console.error("On sendSignalSessionFinalized()", error);
@@ -653,7 +656,14 @@ function renderTimer() {
   setTimeout(renderTimer, 1000);
 }
 
+// Before close/reload event
+const beforeUnloadListener = (event) => {
+  if(!App.ongoing) return;
 
+  event.preventDefault();
+  return event.returnValue = "The video is still uploading. Do you really want to close the window?";
+};
+window.addEventListener("beforeunload", beforeUnloadListener, { capture: true });
 
 
 // Start
