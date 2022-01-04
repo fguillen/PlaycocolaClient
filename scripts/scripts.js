@@ -141,6 +141,8 @@ buttonRecord.addEventListener("click", function () {
 });
 
 buttonStop.addEventListener("click", function () {
+    if(!confirm("Please confirm you want to finish the session")) return;
+
     sendDebugEvent("buttonStop Clicked");
     stopRecord();
     App.shouldStop = true;
