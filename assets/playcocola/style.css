@@ -133,6 +133,12 @@
 
 #play-gathering-description a {
   text-decoration: underline;
+  color: white;
+}
+
+#play-gathering-description li {
+  font-size: 24px;
+  color: #C4C4C4;;
 }
 
 #sa-contact-inner {
