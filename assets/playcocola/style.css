@@ -250,3 +250,30 @@
 #timer {
   font-size: 4em;
 }
+
+#modal-timed-comment .modal-content {
+  background-color: #0F0034;
+  padding-bottom: 0px;
+  color: white;
+}
+
+#modal-timed-comment .close {
+  color: white;
+}
+
+#modal-timed-comment .close:hove {
+  color: rgb(138, 141, 148);
+}
+
+#modal-timed-comment form {
+  color: black;
+}
+
+#modal-timed-comment section {
+  padding: 2em;
+}
+
+#modal-timed-comment select {
+  padding: 12px;
+  width: 100%;
+}

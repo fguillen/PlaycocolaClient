@@ -46,6 +46,54 @@
     <!-- End of header section
         ============================================= -->
 
+        <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-timed-comment">
+  Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="modal-timed-comment" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <section class="sa-contact-inner-section">
+          <div class="container">
+            <div class="saas_two_section_title saas2-headline text-center">
+                <h2><span>Add your</span> comment</h2>
+            </div>
+            <div class="sa-contact-inner-form">
+              <form id="timed-comment-form">
+                <div class="row">
+                  <div class="col-md-6">
+                    <input type="text" name="seconds_at_formatted" placeholder="00:00">
+                  </div>
+                  <div class="col-md-6">
+                    <select>
+                      <option>Comment</option>
+                      <option>Bug</option>
+                      <option>Suggestion</option>
+                    </select>
+                  </div>
+                  <div class="col-md-12">
+                    <textarea name="comment" placeholder="Your Valuable Words"></textarea>
+                  </div>
+                  <div class="sa-contact-inner-btn text-center">
+                    <button type="submit">Send Comment</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
 
     <!-- Start of Banner section
         ============================================= -->
@@ -165,31 +213,30 @@
         ============================================= -->
         <section id="sa-contact-inner" class="sa-contact-inner-section inner-page-padding">
           <div class="container">
-              <div class="saas_two_section_title saas2-headline text-center">
-                  <h2><span>Share your final</span> Thoughts</h2>
-                  <p><small>All fields are optional</small></p>
-              </div>
-              <div class="sa-contact-inner-form">
-                    <form id="thoughts-form">
-                      <div class="row">
-                        <div class="col-md-6">
-                          <input type="text" name="name" placeholder="Your Name">
-                        </div>
-                        <div class="col-md-6">
-                          <input type="email" name="email" placeholder="Your Email">
-                        </div>
-                        <div class="col-md-12">
-                          <textarea name="comment" placeholder="Your Valuable Words"></textarea>
-                        </div>
-                        <div class="sa-contact-inner-btn text-center">
-                          <button type="submit">Send Comment</button>
-                        </div>
-                      </div>
-                    </form>
-              </div>
+            <div class="saas_two_section_title saas2-headline text-center">
+                <h2><span>Share your final</span> Thoughts</h2>
+                <p><small>All fields are optional</small></p>
+            </div>
+            <div class="sa-contact-inner-form">
+              <form id="thoughts-form">
+                <div class="row">
+                  <div class="col-md-6">
+                    <input type="text" name="name" placeholder="Your Name">
+                  </div>
+                  <div class="col-md-6">
+                    <input type="email" name="email" placeholder="Your Email">
+                  </div>
+                  <div class="col-md-12">
+                    <textarea name="comment" placeholder="Your Valuable Words"></textarea>
+                  </div>
+                  <div class="sa-contact-inner-btn text-center">
+                    <button type="submit">Send Comment</button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
-      </div>
-  </section>
+        </section>
   <!-- End of Contact inner page section
       =============================================  -->
 
