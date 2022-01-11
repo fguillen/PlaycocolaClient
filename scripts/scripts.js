@@ -697,6 +697,11 @@ function renderTimer() {
   setTimeout(renderTimer, 1000);
 }
 
+function openTimedCommentModal() {
+  timedCommentForm.querySelector('[name="second_at_formatted"]').value = timerElement.innerHTML;
+  timedCommentModal.show()
+}
+
 // Before close/reload event
 const beforeUnloadListener = (event) => {
   if(!App.ongoing) return;
