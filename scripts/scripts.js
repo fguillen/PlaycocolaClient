@@ -19,6 +19,8 @@ const playGatheringTitle = document.getElementById("play-gathering-title");
 const playGatheringDescription = document.getElementById("play-gathering-description");
 const thoughtsFormDiv = document.getElementById("sa-contact-inner");
 const thoughtsForm = document.getElementById("thoughts-form");
+const timedCommentForm = document.getElementById("timed-comment-form");
+const timedCommentModal = new bootstrap.Modal(document.getElementById("modal-timed-comment"));
 const thanksDiv = document.getElementById("thanks-div");
 const errorDiv = document.getElementById("error-div");
 const permissionForm = document.getElementById("permission-form");
@@ -479,6 +481,13 @@ function captureThoughtsFormSubmit() {
   });
 }
 
+function captureTimedCommentFormSubmit() {
+  timedCommentForm.addEventListener("submit", event => {
+    event.preventDefault();
+    sendTimedComment();
+  });
+}
+
 function thoughtsFormReady() {
   thoughtsFormDiv.style.display = "none";
   thoughtsFormSend();
@@ -490,7 +499,7 @@ async function thoughtsFormSend() {
   let formData = new FormData();
   formData.append("user_name", thoughtsForm.querySelector('[name="name"]').value );
   formData.append("user_email", thoughtsForm.querySelector('[name="email"]').value );
-  formData.append("user_comment", thoughtsForm.querySelector('[name="comment"]').value );
+  formData.append("comment", thoughtsForm.querySelector('[name="comment"]').value );
 
   try {
     let response =
@@ -525,6 +534,35 @@ async function sendSignalSessionFinalized() {
   } catch(error) {
     sendDebugEvent("sendSignalSessionFinalized :: error");
     console.error("On sendSignalSessionFinalized()", error);
+  }
+}
+
+async function sendTimedComment() {
+  sendDebugEvent("sendTimedComment :: ini");
+
+  let formData = new FormData();
+  formData.append("second_at_formatted", timedCommentForm.querySelector('[name="second_at_formatted"]').value );
+  formData.append("flair", timedCommentForm.querySelector('[name="flair"]').value );
+  formData.append("comment", timedCommentForm.querySelector('[name="comment"]').value );
+
+  try {
+    let response =
+      await axios.request({
+        method: "post",
+        url: play_session_api_url + "/add_timed_comment",
+        data: formData,
+        headers: { "Authorization": "Playcocola " + api_token }
+      });
+
+    sendDebugEvent("sendTimedComment :: end");
+
+    timedCommentModal.hide();
+    timedCommentForm.reset();
+  } catch(error) {
+    sendDebugEvent("sendTimedComment :: error");
+    console.error("On sendTimedComment()", error);
+    const errorMessage = "There was a problem trying to send Timed Comment.\n\nPlease try again."
+    showError(errorMessage);
   }
 }
 
@@ -676,4 +714,5 @@ uploadProgressBarUpdate(0);
 iniAPIUrlsAndToken();
 getPlaySessionInfo();
 captureThoughtsFormSubmit();
+captureTimedCommentFormSubmit();
 // sendDebugEvent("PageLoaded");

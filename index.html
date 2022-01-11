@@ -210,7 +210,7 @@
                               <h2 id="timer">00:00</h2>
                             </div>
                             <div class="col-6">
-                              <button class="button-nice color-2" id="button-timed-comment" data-toggle="modal" data-target="#modal-timed-comment"><i class="far fa-comment"></i> Comment</button>
+                              <button class="button-nice color-2" id="button-timed-comment" onclick="timedCommentModal.show()"><i class="far fa-comment"></i> Comment</button>
                             </div>
                           </div>
                         </div>
@@ -438,13 +438,13 @@
                   <form id="timed-comment-form">
                     <div class="row">
                       <div class="col-md-6">
-                        <input type="text" name="seconds_at_formatted" placeholder="00:00">
+                        <input type="text" name="second_at_formatted" placeholder="00:00">
                       </div>
                       <div class="col-md-6">
-                        <select>
-                          <option>Comment</option>
-                          <option>Bug</option>
-                          <option>Suggestion</option>
+                        <select name="flair">
+                          <option value="comment">Comment</option>
+                          <option value="bug">Bug</option>
+                          <option value="suggestion">Suggestion</option>
                         </select>
                       </div>
                       <div class="col-md-12">
