@@ -27,6 +27,7 @@ const permissionMicBlock = document.getElementById("permission-mic-block");
 const permissionScreenCheck = document.getElementById("permission-screen-check");
 const permissionMicCheck = document.getElementById("permission-mic-check");
 const downloadLinksDiv = document.getElementById("download-links");
+const timerWrapperElement = document.getElementById("timer-wrapper");
 const timerElement = document.getElementById("timer");
 
 var initTime = 0;
@@ -58,11 +59,11 @@ buttonContinue.style.display = "none";
 videoElement.style.display = "none";
 linkDownload.style.display = "none";
 progressBarDiv.style.display = "none";
-// thoughtsFormDiv.style.display = "none";
+thoughtsFormDiv.style.display = "none";
 thanksDiv.style.display = "none";
 errorDiv.style.display = "none";
 permissionForm.style.display = "none";
-timerElement.style.display = "none";
+timerWrapperElement.style.display = "none";
 
 function setMimeType(){
   if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
@@ -80,7 +81,7 @@ function startRecord() {
   buttonPause.style.display = "inline-block";
   buttonStop.style.display = "inline-block";
   videoElement.style.display = "inline-block";
-  timerElement.style.display = "inline-block";
+  timerWrapperElement.style.display = "inline-block";
   initTimeAt = new Date().getTime();
 
   renderTimer();
@@ -117,7 +118,7 @@ function stopRecord() {
   videoElement.style.display = "none";
   buttonPause.style.display = "none";
   buttonContinue.style.display = "none";
-  timerElement.style.display = "none";
+  timerWrapperElement.style.display = "none";
 }
 
 // function uploadFinished() {

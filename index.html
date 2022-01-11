@@ -46,55 +46,6 @@
     <!-- End of header section
         ============================================= -->
 
-        <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-timed-comment">
-  Launch demo modal
-</button>
-
-<!-- Modal -->
-<div class="modal fade" id="modal-timed-comment" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <section class="sa-contact-inner-section">
-          <div class="container">
-            <div class="saas_two_section_title saas2-headline text-center">
-                <h2><span>Add your</span> comment</h2>
-            </div>
-            <div class="sa-contact-inner-form">
-              <form id="timed-comment-form">
-                <div class="row">
-                  <div class="col-md-6">
-                    <input type="text" name="seconds_at_formatted" placeholder="00:00">
-                  </div>
-                  <div class="col-md-6">
-                    <select>
-                      <option>Comment</option>
-                      <option>Bug</option>
-                      <option>Suggestion</option>
-                    </select>
-                  </div>
-                  <div class="col-md-12">
-                    <textarea name="comment" placeholder="Your Valuable Words"></textarea>
-                  </div>
-                  <div class="sa-contact-inner-btn text-center">
-                    <button type="submit">Send Comment</button>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  </div>
-</div>
-
     <!-- Start of Banner section
         ============================================= -->
         <section id="eight-banner" class="eight-banner-section position-relative">
@@ -253,8 +204,15 @@
                         <button class="button-nice color-2" id="button-continue"><i class="fas fa-bullseye"></i> Continue</button>
                         <button class="button-nice color-1" id="button-stop"><i class="far fa-stop-circle"></i> Finish Session</button>
 
-                        <div class="saas_two_section_title saas2-headline text-center">
-                          <h2 id="timer">00:00</h2>
+                        <div class="saas_two_section_title saas2-headline text-center" id="timer-wrapper" style="margin-top: 2em">
+                          <div class="row">
+                            <div class="col-6">
+                              <h2 id="timer">00:00</h2>
+                            </div>
+                            <div class="col-6">
+                              <button class="button-nice color-2" id="button-timed-comment" data-toggle="modal" data-target="#modal-timed-comment"><i class="far fa-comment"></i> Comment</button>
+                            </div>
+                          </div>
                         </div>
 
                         <div id="upload-progress">
@@ -458,6 +416,52 @@
         <div class="ei-footer-shape2 position-absolute" data-parallax='{"y" : 60}'><img src="assets/img/app-landing/shape/fo-shape2.png" alt=""></div>
         <div class="ei-footer-shape3 position-absolute"><img src="assets/img/app-landing/shape/eimap.png" alt=""></div>
     </section>
+
+
+    <!-- Modal - TimedComment -->
+    <div class="modal fade" id="modal-timed-comment" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Timed <span>comment</span> </h2>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <section class="sa-contact-inner-section">
+              <div class="container">
+                <div class="saas_two_section_title saas2-headline text-center">
+
+                </div>
+                <div class="sa-contact-inner-form">
+                  <form id="timed-comment-form">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <input type="text" name="seconds_at_formatted" placeholder="00:00">
+                      </div>
+                      <div class="col-md-6">
+                        <select>
+                          <option>Comment</option>
+                          <option>Bug</option>
+                          <option>Suggestion</option>
+                        </select>
+                      </div>
+                      <div class="col-md-12">
+                        <textarea name="comment" placeholder="Your Valuable Words"></textarea>
+                      </div>
+                      <div class="sa-contact-inner-btn text-center">
+                        <button type="submit">Send Comment</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
       <!-- End of Footer  section
         ============================================= -->
 

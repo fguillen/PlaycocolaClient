@@ -247,7 +247,7 @@
 	}
 }
 
-#timer {
+#timer{
   font-size: 4em;
 }
 
@@ -270,10 +270,18 @@
 }
 
 #modal-timed-comment section {
-  padding: 2em;
+  padding: 1em 2em 2em 2em;
 }
 
 #modal-timed-comment select {
   padding: 12px;
   width: 100%;
+}
+
+#button-timed-comment {
+  font-size: 33px;
+  height: 83px;
+  width: 289px;
+  line-height: 78px;
+  text-align: center;
 }
