@@ -499,7 +499,7 @@ async function thoughtsFormSend() {
   let formData = new FormData();
   formData.append("user_name", thoughtsForm.querySelector('[name="name"]').value );
   formData.append("user_email", thoughtsForm.querySelector('[name="email"]').value );
-  formData.append("comment", thoughtsForm.querySelector('[name="comment"]').value );
+  formData.append("user_comment", thoughtsForm.querySelector('[name="comment"]').value );
 
   try {
     let response =
