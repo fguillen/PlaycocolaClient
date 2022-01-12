@@ -151,8 +151,12 @@ buttonStop.addEventListener("click", function () {
     App.shouldStop = true;
     App.stopped = true;
     sessionFinalized = true;
-    if(mediaRecorder.state == "recording")
+
+    if(mediaRecorder.state == "recording") {
       mediaRecorder.stop();
+    } else {
+      // recordVideoChunk(); // Trick so the FinalizedSession is sent
+    }
 });
 
 buttonPause.addEventListener("click", function () {
