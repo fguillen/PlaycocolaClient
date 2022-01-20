@@ -204,7 +204,8 @@ function recordVideoChunk() {
     actualChunks = recordedChunks.splice(0, recordedChunks.length);
     const blob = new Blob(actualChunks, { type: mimeType });
     // getSeekableBlob(blob, uploadVideoPart);
-    uploadVideoPart(blob);
+    if(blob.size > 0)
+      uploadVideoPart(blob);
 
     if(App.stopped){
       if(fullStream != null)
