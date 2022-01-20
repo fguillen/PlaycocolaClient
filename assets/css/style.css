@@ -1,15 +1,15 @@
 @charset "UTF-8";
 /*----------------------------------------------------
 @File: Default Styles
-@Author: 
-@URL: 
+@Author:
+@URL:
 
 This file contains the styling for the actual theme, this
 is the file you need to edit to change the look of the
 theme.
 ---------------------------------------------------- */
 /*=====================================================================
-@Template Name: 
+@Template Name:
 @Author: Themexriver.
 
 **Css Table Of Content**
@@ -52,7 +52,7 @@ theme.
   *6- Partner Area
   *7- Team Area
   *8- Testimonial Area
-  *9- Newslatter Area 
+  *9- Newslatter Area
 4- SaaS Classic --
   *1- Global Area
   *2- Header Area
@@ -74,7 +74,7 @@ theme.
   *7- Portfolio Area
   *8- Testimonial Area
   *9= Partner Area
-  *10- Footer 
+  *10- Footer
  2- Digital Agency --
   *1- Global Area
   *2- Header Area
@@ -88,7 +88,7 @@ theme.
   *10- Testimonial Area
   *11- Blog Area
   *12- Newslatter Area
-  *13- Footer 
+  *13- Footer
   =====================================================================*/
   @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@400;500;600;700&display=swap");
   @import url("https://fonts.googleapis.com/css?family=Poppins:400,500,600,700|Roboto:100,500,300,400,700&display=swap");
@@ -576,7 +576,7 @@ theme.
     visibility: visible;
   }
 
-/* -------------------------------- 
+/* --------------------------------
 Sticky Menu
 -------------------------------- */
 .eisticky-menu-bg-overlay {
@@ -2842,7 +2842,7 @@ Sticky Menu
     width: 322px;
   }
 }
-@media screen and (max-width: 1024px) { 
+@media screen and (max-width: 1024px) {
   .main-header-eight .appheader-content .site-logo  {
     margin-right: 40px
   }
@@ -7368,7 +7368,7 @@ Sticky Menu
 
 .partner_section .section_title {
   margin: 0 auto;
-  max-width: 550px; 
+  max-width: 550px;
   padding: 0px 0px 25px 85px;
 }
 
@@ -8022,7 +8022,7 @@ Sticky Menu
     font-size: 22px;
   }
 }
-@media screen and (max-width: 1024px) { 
+@media screen and (max-width: 1024px) {
   .banner_screen .screen_img .side_screen2 {
     right: -40px;
   }
@@ -13709,7 +13709,7 @@ div#preloader {
   background-image: linear-gradient(81deg, #ff6600 0%, #ff9903 75%, #ffcb05 100%);
 }
 
-.dia-main-header .dia-main-navigation li a:hover:before, 
+.dia-main-header .dia-main-navigation li a:hover:before,
 .dia-main-header .dia-main-navigation li a.active:before {
   width: 100%;
 }
@@ -16074,7 +16074,7 @@ div#preloader {
   padding: 15px 30px;
   background-color: #73299a;
 }
-@media screen and (max-width: 1024px) { 
+@media screen and (max-width: 1024px) {
   .news-feed-section .saasio-blog-text {
     padding: 22px 30px 30px 0px
   }
@@ -16085,10 +16085,10 @@ div#preloader {
     font-size: 18px;
   }
 }
-@media screen and (max-width: 991px) { 
+@media screen and (max-width: 991px) {
   .blog-feed-img {
     margin-bottom: 20px;
-  } 
+  }
   .blog-feed-img-txt {
     padding: 30px;
   }
@@ -16096,7 +16096,7 @@ div#preloader {
     padding-left: 0;
   }
 }
-@media screen and (max-width: 767px) { 
+@media screen and (max-width: 767px) {
   .saasio-blog-sidebar {
     margin-top: 30px;
   }

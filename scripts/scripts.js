@@ -31,6 +31,7 @@ const permissionMicCheck = document.getElementById("permission-mic-check");
 const downloadLinksDiv = document.getElementById("download-links");
 const timerWrapperElement = document.getElementById("timer-wrapper");
 const timerElement = document.getElementById("timer");
+const coverElement = document.getElementById("play-gathering-cover");
 
 var initTime = 0;
 var initTimeAt = null;
@@ -66,6 +67,7 @@ thanksDiv.style.display = "none";
 errorDiv.style.display = "none";
 permissionForm.style.display = "none";
 timerWrapperElement.style.display = "none";
+coverElement.style.display = "none";
 
 function setMimeType(){
   if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
@@ -227,40 +229,6 @@ function recordVideoChunk() {
   }, videoPartsMilliseconds);
 }
 
-// function createDownloadLink(blob, filename) {
-//   console.log("createDownloadLink(" + filename + ")");
-
-//   const copyBlob = new Blob([blob], {type: blob.type});
-//   const videoUrl = URL.createObjectURL(copyBlob);
-
-//   const link = document.createElement('a');
-//   link.setAttribute("href", videoUrl);
-//   link.setAttribute("download", filename);
-//   link.setAttribute("target", "_blank");
-//   link.innerText = filename;
-//   downloadLinksDiv.appendChild(link);
-// }
-
-// function finalBlob(blob) {
-//   sendDebugEvent("FinalBlob :: ini");
-//   const filename = "MyPlayTestingSession_" + Date.now();
-//   let videoUrl = URL.createObjectURL(blob);
-//   linkDownload.href = videoUrl;
-//   linkDownload.download = `${filename || "recording"}.webm`;
-//   linkDownload.style.display = "inline-block";
-
-//   videoElement.srcObject = null;
-//   videoElement.src = videoUrl;
-//   videoElement.load();
-//   videoElement.onloadeddata = function() {
-//     console.log("video.onloadeddata()");
-//     videoElement.controls = true;
-//   }
-
-//   sendDebugEvent("FinalBlob :: end");
-//   uploadFile(blob);
-// }
-
 // From: https://stackoverflow.com/a/43378874/316700
 function getParam(param){
   return new URLSearchParams(window.location.search).get(param);
@@ -276,14 +244,24 @@ function getPlaySessionInfo() {
   }).then(function(response) {
     iniPlaySessionAPIUrl(response.data.play_session_api_url);
     showPlaySessionInfo(response.data.play_gathering);
+
+    if(response.data.play_gathering.cover_url != null) {
+      ShowCover(response.data.play_gathering.cover_url);
+    }
+
     showPermissionForm();
     sendDebugEvent("GetPlaySessionInfo :: end");
   }).catch(function (error) {
     sendDebugEvent("GetPlaySessionInfo :: error");
     const errorMessage = "There was a problem trying to get the information for this Play Session.\n\nPlease try again."
-    console.error("On getPlaySessionInfo()", errorMessage);
+    console.error("On getPlaySessionInfo()", errorMessage, error);
     showError(errorMessage);
   });
+}
+
+function ShowCover(cover_url) {
+  coverElement.src = cover_url;
+  coverElement.style.display = "block";
 }
 
 function showError(errorMessage) {
@@ -312,33 +290,6 @@ function showPlaySessionInfo(info) {
 function showPermissionForm() {
   permissionForm.style.display = "block";
 }
-
-// function getSeekableBlob(inputBlob, callback) {
-//   sendDebugEvent("GetSeekableBlob : ini");
-//   // EBML.js copyrights goes to: https://github.com/legokichi/ts-ebml
-//   if (typeof EBML === 'undefined') {
-//       throw new Error('Please link: https://cdn.webrtc-experiment.com/EBML.js');
-//   }
-//   var reader = new EBML.Reader();
-//   var decoder = new EBML.Decoder();
-//   var tools = EBML.tools;
-//   var fileReader = new FileReader();
-//   fileReader.onload = function(e) {
-//       var ebmlElms = decoder.decode(this.result);
-//       ebmlElms.forEach(function(element) {
-//           reader.read(element);
-//       });
-//       reader.stop();
-//       var refinedMetadataBuf = tools.makeMetadataSeekable(reader.metadatas, reader.duration, reader.cues);
-//       var body = this.result.slice(reader.metadataSize);
-//       var newBlob = new Blob([refinedMetadataBuf, body], {
-//           type: 'video/webm'
-//       });
-//       sendDebugEvent("GetSeekableBlob :: end");
-//       callback(newBlob);
-//   };
-//   fileReader.readAsArrayBuffer(inputBlob);
-// }
 
 async function recordScreen() {
     sendDebugEvent("recordScreen :: ini");
@@ -435,36 +386,6 @@ async function uploadVideoPart(blob) {
     sendDebugEvent("uploadVideoPart :: end");
   }
 }
-
-// async function uploadFile(blob) {
-//   sendDebugEvent("UploadFile :: ini");
-
-//   let formData = new FormData();
-//   formData.append("video", blob);
-
-//   try {
-//     console.log("Start uploading");
-
-//     let response =
-//       await axios.request({
-//         method: "post",
-//         url: play_session_api_url + "/video",
-//         data: formData,
-//         headers: { "Authorization": "Playcocola " + api_token },
-//         onUploadProgress: (p) => {
-//           console.log("progress: ", p);
-//           uploadProgressBarUpdate(p.loaded / p.total);
-//         }
-//       });
-
-//     console.log("HTTP response:", response);
-//     console.log("HTTP response code:", response.status);
-//     sendDebugEvent("UploadFile :: end");
-//     uploadFinished(response.data.uuid);
-//   } catch(e) {
-//     console.log("Error on uploadFile...:", e);
-//   }
-// }
 
 var lastUploadPercentageDebugEvent = 0;
 function uploadProgressBarUpdate(percentage) {

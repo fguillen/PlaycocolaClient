@@ -285,3 +285,8 @@
   line-height: 78px;
   text-align: center;
 }
+
+#play-gathering-cover {
+  width: 100%;
+  border-radius: 30px;
+}
