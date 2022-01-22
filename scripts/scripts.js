@@ -8,6 +8,9 @@ var thoughtsFormIsReady = false;
 var uploadIsFinished = false;
 var playSessionUUID = null;
 
+const uploadBlobsQueue = [];
+var uploadBlobsQueueUploading = false;
+
 const videoElement = document.getElementById("video-element");
 const linkDownload = document.getElementById("link-download");
 const buttonRecord = document.getElementById("button-record");
@@ -15,6 +18,7 @@ const buttonStop = document.getElementById("button-stop");
 const buttonPause = document.getElementById("button-pause");
 const buttonContinue = document.getElementById("button-continue");
 const progressBarDiv = document.getElementById("upload-progress");
+const uploadQueueCounter = document.getElementById("upload-queue-counter");
 const playGatheringTitle = document.getElementById("play-gathering-title");
 const playGatheringDescription = document.getElementById("play-gathering-description");
 const thoughtsFormDiv = document.getElementById("sa-contact-inner");
@@ -68,6 +72,7 @@ errorDiv.style.display = "none";
 permissionForm.style.display = "none";
 timerWrapperElement.style.display = "none";
 coverElement.style.display = "none";
+uploadQueueCounter.style.display = "none";
 
 function setMimeType(){
   if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
@@ -157,7 +162,11 @@ buttonStop.addEventListener("click", function () {
     if(mediaRecorder.state == "recording") {
       mediaRecorder.stop();
     } else {
-      // recordVideoChunk(); // Trick so the FinalizedSession is sent
+      if(!uploadBlobsQueueUploading && uploadBlobsQueue.length == 0) {
+        sendSignalSessionFinalized();
+        if(thoughtsSent)
+          thanksDiv.style.display = "block";
+      }
     }
 });
 
@@ -205,7 +214,7 @@ function recordVideoChunk() {
     const blob = new Blob(actualChunks, { type: mimeType });
     // getSeekableBlob(blob, uploadVideoPart);
     if(blob.size > 0)
-      uploadVideoPart(blob);
+      addBlobToUploadQueue(blob);
 
     if(App.stopped){
       if(fullStream != null)
@@ -377,13 +386,15 @@ async function uploadVideoPart(blob) {
   } finally {
     progressBarDiv.style.display = "none";
     uploadFinished = true;
+    uploadBlobsQueueUploading = false;
 
-    if(sessionFinalized) {
+    if(sessionFinalized && uploadBlobsQueue.length == 0) {
       sendSignalSessionFinalized();
       if(thoughtsSent)
         thanksDiv.style.display = "block";
     }
 
+    uploadNextBlob();
     sendDebugEvent("uploadVideoPart :: end");
   }
 }
@@ -626,6 +637,31 @@ function renderTimer() {
 function openTimedCommentModal() {
   timedCommentForm.querySelector('[name="second_at_formatted"]').value = timerElement.innerHTML;
   timedCommentModal.show()
+}
+
+function addBlobToUploadQueue(blob) {
+  uploadBlobsQueue.push(blob);
+  updateUploadQueueCounter();
+  uploadNextBlob();
+}
+
+function uploadNextBlob() {
+  if(uploadBlobsQueueUploading || uploadBlobsQueue.length == 0)
+    return;
+
+  uploadBlobsQueueUploading = true;
+  var blob = uploadBlobsQueue.shift();
+  updateUploadQueueCounter();
+  uploadVideoPart(blob);
+}
+
+function updateUploadQueueCounter() {
+  if(uploadBlobsQueue.length == 0) {
+    uploadQueueCounter.style.display = "none";
+  } else {
+    uploadQueueCounter.style.display = "flex";
+    uploadQueueCounter.querySelector("span").innerHTML = uploadBlobsQueue.length;
+  }
 }
 
 // Before close/reload event
