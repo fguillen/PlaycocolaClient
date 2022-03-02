@@ -29,7 +29,9 @@ const thanksDiv = document.getElementById("thanks-div");
 const errorDiv = document.getElementById("error-div");
 const permissionForm = document.getElementById("permission-form");
 const permissionScreenBlock = document.getElementById("permission-screen-block");
+const permissionTermsBlock = document.getElementById("permission-terms-block");
 const permissionMicBlock = document.getElementById("permission-mic-block");
+const permissionTermsCheck = document.getElementById("permission-terms-check");
 const permissionScreenCheck = document.getElementById("permission-screen-check");
 const permissionMicCheck = document.getElementById("permission-mic-check");
 const downloadLinksDiv = document.getElementById("download-links");
@@ -537,15 +539,23 @@ async function captureMicStream() {
   }
 }
 
-function checkScreenPermissionsAccepted() {
-  if(permissionScreenCheck.checked) {
-    sendDebugEvent("ScreenPermissionsAccepted");
+function checkTermsPermissionsAccepted() {
+  if(permissionScreenCheck.checked && permissionTermsCheck.checked) {
     showButtonRecord();
   }
 }
 
+function checkScreenPermissionsAccepted() {
+  if(permissionScreenCheck.checked) {
+    sendDebugEvent("ScreenPermissionsAccepted");
+    if(permissionTermsCheck.checked) {
+      showButtonRecord();
+    }
+  }
+}
+
 function checkAllPermissionsAccepted() {
-  if(permissionScreenCheck.checked && permissionMicCheck.checked) {
+  if(permissionScreenCheck.checked && permissionMicCheck.checked && permissionTermsCheck.checked) {
     sendDebugEvent("AllPermissionsAccepted");
     hidePermissionForm();
   }
@@ -557,6 +567,14 @@ function hidePermissionForm () {
 
 function showButtonRecord() {
   buttonRecord.style.display = "inline-block";
+}
+
+function clickOnPermissionTermsCheck() {
+  if(permissionTermsCheck.checked) {
+    sendDebugEvent("TermsPermissionsAccepted");
+    permissionTermsBlock.style.display = "none";
+    checkTermsPermissionsAccepted();
+  }
 }
 
 function clickOnPermissionScreenCheck() {
