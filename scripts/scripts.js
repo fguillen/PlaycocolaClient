@@ -4,9 +4,10 @@ App.shouldStop = false;
 App.stopped = false;
 App.ongoing = false;
 
+playGathering = new Object();
+
 var thoughtsFormIsReady = false;
 var uploadIsFinished = false;
-var playSessionUUID = null;
 
 const uploadBlobsQueue = [];
 var uploadBlobsQueueUploading = false;
@@ -39,6 +40,9 @@ const timerWrapperElement = document.getElementById("timer-wrapper");
 const timerElement = document.getElementById("timer");
 const coverElement = document.getElementById("play-gathering-cover");
 
+const developerCheckboxesForm = document.getElementById("developer-checkboxes-form");
+const developerCheckboxBlockTemplateDiv = document.getElementById("developer-checkbox-block-template");
+
 var initTime = 0;
 var initTimeAt = null;
 
@@ -47,7 +51,6 @@ var micStream;
 var fullStream;
 
 var play_gathering_api_url;
-var play_session_api_url;
 var api_token;
 
 var mimeType;
@@ -75,6 +78,7 @@ permissionForm.style.display = "none";
 timerWrapperElement.style.display = "none";
 coverElement.style.display = "none";
 uploadQueueCounter.style.display = "none";
+developerCheckboxesForm.style.display = "none"
 
 function setMimeType(){
   if(MediaRecorder.isTypeSupported("video/webm;codecs=vp9")){
@@ -254,8 +258,8 @@ function getPlaySessionInfo() {
     url: play_gathering_api_url,
     headers: { "Authorization": "Playcocola " + api_token }
   }).then(function(response) {
-    iniPlaySessionAPIUrl(response.data.play_session_api_url);
-    showPlaySessionInfo(response.data.play_gathering);
+    iniPlayGatheringData(response.data);
+    showPlayGatheringInfo(response.data.play_gathering);
 
     if(response.data.play_gathering.cover_url != null) {
       ShowCover(response.data.play_gathering.cover_url);
@@ -292,11 +296,13 @@ function makeAllLinksTargetBlank(element) {
   element.querySelectorAll("a").forEach( link => link.setAttribute('target', '_blank') );
 }
 
-function showPlaySessionInfo(info) {
-  // console.log("showPlaySessionInfo", info);
+function showPlayGatheringInfo(info) {
+  // console.log("showPlayGatheringInfo", info);
   playGatheringTitle.textContent = info.title;
   playGatheringDescription.innerHTML = marked(info.description);
+  showDeveloperCheckboxes();
   makeAllLinksTargetBlank(playGatheringDescription);
+  makeAllLinksTargetBlank(developerCheckboxesForm);
 }
 
 function showPermissionForm() {
@@ -374,7 +380,7 @@ async function uploadVideoPart(blob) {
     let response =
       await axios.request({
         method: "post",
-        url: play_session_api_url + "/video_part",
+        url: playGathering.playSessionApiURL + "/video_part",
         data: formData,
         headers: { "Authorization": "Playcocola " + api_token },
         onUploadProgress: (p) => {
@@ -444,7 +450,7 @@ async function thoughtsFormSend() {
     let response =
       await axios.request({
         method: "post",
-        url: play_session_api_url + "/comment",
+        url: playGathering.playSessionApiURL + "/comment",
         data: formData,
         headers: { "Authorization": "Playcocola " + api_token }
       });
@@ -464,7 +470,7 @@ async function sendSignalSessionFinalized() {
     let response =
       await axios.request({
         method: "post",
-        url: play_session_api_url + "/session_finalized",
+        url: playGathering.playSessionApiURL + "/session_finalized",
         headers: { "Authorization": "Playcocola " + api_token }
       });
 
@@ -488,7 +494,7 @@ async function sendTimedComment() {
     let response =
       await axios.request({
         method: "post",
-        url: play_session_api_url + "/add_timed_comment",
+        url: playGathering.playSessionApiURL + "/add_timed_comment",
         data: formData,
         headers: { "Authorization": "Playcocola " + api_token }
       });
@@ -603,7 +609,7 @@ function sendDebugEvent(value) {
 
   axios.request({
     method: "post",
-    url: play_session_api_url + "/event",
+    url: playGathering.playSessionApiURL + "/event",
     data: formData,
     headers: { "Authorization": "Playcocola " + api_token }
   }).catch(function (error) {
@@ -630,9 +636,21 @@ function iniAPIUrlsAndToken() {
   api_token = getParam("api_token");
 }
 
-function iniPlaySessionAPIUrl(url) {
-  play_session_api_url = url;
+function iniPlayGatheringData(data) {
+  playGathering.playSessionApiURL = data.play_session_api_url;
+  playGathering.uuid = data.play_gathering.uuid;
+  playGathering.title = data.play_gathering.title;
+  playGathering.description = data.play_gathering.description;
+  playGathering.coverUrl = data.play_gathering.cover_url;
+  playGathering.playtestingSessionMinutes = data.play_gathering.playtesting_session_minutes;
+  playGathering.fullGameplayMinutes = data.play_gathering.full_gameplay_minutes;
+  playGathering.playtesterReward = data.play_gathering.playtester_reward;
+  playGathering.requiredCheckboxes = data.play_gathering.required_checkboxes;
+  playGathering.afterRequiredCheckboxesDescription = data.play_gathering.after_required_checkboxes_description;
+  playGathering.afterSessionFinishedDescription = data.play_gathering.after_session_finished_description;
+  playGathering.gameBuildUrl = data.play_gathering.game_build_url;
 }
+
 
 function renderTimer() {
   if(isPaused || App.stopped)
@@ -680,6 +698,32 @@ function updateUploadQueueCounter() {
     uploadQueueCounter.style.display = "flex";
     uploadQueueCounter.querySelector("span").innerHTML = uploadBlobsQueue.length;
   }
+}
+
+function clickOnDeveloperCheckboxCheck() {
+  hideDeveloperCheckboxesFormIfFinishedOrEmpty();
+}
+
+function hideDeveloperCheckboxesFormIfFinishedOrEmpty() {
+  if (Array(...developerCheckboxesForm.querySelectorAll("input[type=checkbox].dynamic")).every(e => e.checked)) {
+    developerCheckboxesForm.style.display = "none";
+  }
+}
+
+function showDeveloperCheckboxes() {
+  playGathering.requiredCheckboxes.forEach((e, index) => {
+    let divCloned = developerCheckboxBlockTemplateDiv.cloneNode(true);
+    document.querySelector(".developer-checkboxes").appendChild(divCloned);
+
+    divCloned.classList.remove("hidden");
+    divCloned.querySelector("input[type=checkbox]").id = "developer-check-" + index;
+    divCloned.querySelector("input[type=checkbox]").classList.add("dynamic");
+    divCloned.querySelector("label").innerHTML = marked(e).replace(/^<p>/, "").replace(/<\/p>\n$ /, "");
+    divCloned.querySelector("label").setAttribute("for", "developer-check-" + index);
+  });
+
+  developerCheckboxesForm.style.display = "block";
+  hideDeveloperCheckboxesFormIfFinishedOrEmpty
 }
 
 // Before close/reload event
