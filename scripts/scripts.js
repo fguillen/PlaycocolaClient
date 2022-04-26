@@ -24,6 +24,8 @@ const playGatheringTitle = document.getElementById("play-gathering-title");
 const playGatheringDescription = document.getElementById("play-gathering-description");
 const playGatheringExtraInformation = document.getElementById("play-gathering-extra-information");
 const playGatheringExtraInformationBlock = document.getElementById("play-gathering-extra-information-block");
+const playGatheringAfterSessionMessage = document.getElementById("play-gathering-after-session-message");
+const playGatheringAfterSessionMessageBlock = document.getElementById("play-gathering-after-session-message-block");
 const DownloadGameBlock = document.getElementById("download-game-block");
 const DownloadGameLink = document.getElementById("download-game-link");
 const thoughtsFormDiv = document.getElementById("sa-contact-inner");
@@ -68,6 +70,7 @@ var thoughtsSent = false;
 var isPaused = false;
 var extraInformationPresent = false;
 var downloadPresent = false;
+var afterSessionMessagePresent = false;
 
 
 buttonRecord.style.display = "none";
@@ -136,6 +139,11 @@ function stopRecord() {
   buttonStop.style.display = "none";
   // progressBarDiv.style.display = "block";
   thoughtsFormDiv.style.display = "block";
+
+  if (afterSessionMessagePresent) {
+    playGatheringAfterSessionMessageBlock.style.display = "block";
+  }
+
   videoElement.style.display = "none";
   buttonPause.style.display = "none";
   buttonContinue.style.display = "none";
@@ -317,8 +325,18 @@ function showPlayGatheringInfo(info) {
     downloadPresent = true;
   }
 
-  showDeveloperCheckboxes();
+  if (info.after_session_finished_description != null) {
+    playGatheringAfterSessionMessage.innerHTML = marked(info.after_session_finished_description);
+    afterSessionMessagePresent = true;
+  }
+
+  if (info.required_checkboxes.length > 0) {
+    showDeveloperCheckboxes();
+  }
+
   makeAllLinksTargetBlank(playGatheringDescription);
+  makeAllLinksTargetBlank(playGatheringExtraInformation);
+  makeAllLinksTargetBlank(playGatheringAfterSessionMessage);
   makeAllLinksTargetBlank(developerCheckboxesForm);
 }
 
