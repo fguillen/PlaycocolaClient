@@ -26,6 +26,8 @@ const playGatheringExtraInformation = document.getElementById("play-gathering-ex
 const playGatheringExtraInformationBlock = document.getElementById("play-gathering-extra-information-block");
 const playGatheringAfterSessionMessage = document.getElementById("play-gathering-after-session-message");
 const playGatheringAfterSessionMessageBlock = document.getElementById("play-gathering-after-session-message-block");
+const playtesterReward = document.getElementById("playtester-reward-description");
+const playtesterRewardBlock = document.getElementById("playtester-reward");
 const DownloadGameBlock = document.getElementById("download-game-block");
 const DownloadGameLink = document.getElementById("download-game-link");
 const thoughtsFormDiv = document.getElementById("sa-contact-inner");
@@ -314,6 +316,11 @@ function showPlayGatheringInfo(info) {
   // console.log("showPlayGatheringInfo", info);
   playGatheringTitle.textContent = info.title;
   playGatheringDescription.innerHTML = marked(info.description);
+
+  if (info.playtester_reward != null) {
+    playtesterReward.innerHTML = marked(info.playtester_reward);
+    playtesterRewardBlock.style.display = "block";
+  }
 
   if (info.after_required_checkboxes_description != null) {
     playGatheringExtraInformation.innerHTML = marked(info.after_required_checkboxes_description);
