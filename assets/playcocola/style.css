@@ -141,6 +141,15 @@
   color: #C4C4C4;;
 }
 
+.play-gathering-text h1,
+.play-gathering-text h2,
+.play-gathering-text h3,
+.play-gathering-text h4,
+.play-gathering-text h5,
+.play-gathering-text h6 {
+  color: white
+}
+
 #sa-contact-inner {
   background-color: #0F0034;
   padding-bottom: 0px;
