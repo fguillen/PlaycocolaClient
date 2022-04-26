@@ -22,6 +22,8 @@ const progressBarDiv = document.getElementById("upload-progress");
 const uploadQueueCounter = document.getElementById("upload-queue-counter");
 const playGatheringTitle = document.getElementById("play-gathering-title");
 const playGatheringDescription = document.getElementById("play-gathering-description");
+const playGatheringExtraInformation = document.getElementById("play-gathering-extra-information");
+const playGatheringExtraInformationBlock = document.getElementById("play-gathering-extra-information-block");
 const thoughtsFormDiv = document.getElementById("sa-contact-inner");
 const thoughtsForm = document.getElementById("thoughts-form");
 const timedCommentForm = document.getElementById("timed-comment-form");
@@ -62,6 +64,7 @@ var sessionFinalized = false;
 var uploadFinished = true;
 var thoughtsSent = false;
 var isPaused = false;
+var extraInformationPresent = false;
 
 
 buttonRecord.style.display = "none";
@@ -300,6 +303,12 @@ function showPlayGatheringInfo(info) {
   // console.log("showPlayGatheringInfo", info);
   playGatheringTitle.textContent = info.title;
   playGatheringDescription.innerHTML = marked(info.description);
+
+  if (info.after_required_checkboxes_description != null) {
+    playGatheringExtraInformation.innerHTML = marked(info.after_required_checkboxes_description);
+    extraInformationPresent = true;
+  }
+
   showDeveloperCheckboxes();
   makeAllLinksTargetBlank(playGatheringDescription);
   makeAllLinksTargetBlank(developerCheckboxesForm);
@@ -707,6 +716,10 @@ function clickOnDeveloperCheckboxCheck() {
 function hideDeveloperCheckboxesFormIfFinishedOrEmpty() {
   if (Array(...developerCheckboxesForm.querySelectorAll("input[type=checkbox].dynamic")).every(e => e.checked)) {
     developerCheckboxesForm.style.display = "none";
+
+    if (extraInformationPresent) {
+      playGatheringExtraInformationBlock.style.display = "block";
+    }
   }
 }
 
