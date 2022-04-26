@@ -24,6 +24,8 @@ const playGatheringTitle = document.getElementById("play-gathering-title");
 const playGatheringDescription = document.getElementById("play-gathering-description");
 const playGatheringExtraInformation = document.getElementById("play-gathering-extra-information");
 const playGatheringExtraInformationBlock = document.getElementById("play-gathering-extra-information-block");
+const DownloadGameBlock = document.getElementById("download-game-block");
+const DownloadGameLink = document.getElementById("download-game-link");
 const thoughtsFormDiv = document.getElementById("sa-contact-inner");
 const thoughtsForm = document.getElementById("thoughts-form");
 const timedCommentForm = document.getElementById("timed-comment-form");
@@ -65,6 +67,7 @@ var uploadFinished = true;
 var thoughtsSent = false;
 var isPaused = false;
 var extraInformationPresent = false;
+var downloadPresent = false;
 
 
 buttonRecord.style.display = "none";
@@ -307,6 +310,11 @@ function showPlayGatheringInfo(info) {
   if (info.after_required_checkboxes_description != null) {
     playGatheringExtraInformation.innerHTML = marked(info.after_required_checkboxes_description);
     extraInformationPresent = true;
+  }
+
+  if (info.game_build_url != null) {
+    DownloadGameLink.setAttribute("href", info.game_build_url);
+    downloadPresent = true;
   }
 
   showDeveloperCheckboxes();
@@ -719,6 +727,10 @@ function hideDeveloperCheckboxesFormIfFinishedOrEmpty() {
 
     if (extraInformationPresent) {
       playGatheringExtraInformationBlock.style.display = "block";
+    }
+
+    if (downloadPresent) {
+      DownloadGameBlock.style.display = "block";
     }
   }
 }

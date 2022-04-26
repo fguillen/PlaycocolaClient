@@ -123,8 +123,8 @@
           <div class="text-left permission-checks developer-checkboxes mx-5 mt-1">
 
             <div class="custom-control custom-checkbox hidden developer-checkbox" id="developer-checkbox-block-template">
-              <input onclick="clickOnDeveloperCheckboxCheck()" type="checkbox" class="custom-control-input" id="permission-terms-check" autocomplete="off">
-              <label class="custom-control-label" for="permission-terms-check">The text of the checkbox</label>
+              <input onclick="clickOnDeveloperCheckboxCheck()" type="checkbox" class="custom-control-input" id="check-template" autocomplete="off">
+              <label class="custom-control-label" for="check-template">The text of the checkbox</label>
             </div>
 
           </div>
@@ -149,6 +149,23 @@
     </section>
     <!-- End of Extra message section
             ============================================= -->
+
+    <!-- Start of Download section
+            ============================================= -->
+    <section id="download-game-block" class="button-section position-relative feature-eight-section" style="padding-top: 0px; padding-bottom: 50px; display: none;">
+      <div class="container text-center">
+        <div class="eight-banner-content">
+          <div class="banner-content-box appeight-headline pera-content">
+            <div class="ei-banner-btn">
+              <a href="#" class="button-nice button-small color-1" id="download-game-link" target="_blank"><i class="fas fa-download"></i> Download Game</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End of Download section
+            ============================================= -->
+
 
     <!-- Permissions :: INI
         ============================================= -->
@@ -267,7 +284,7 @@
                               <h2 id="timer">00:00</h2>
                             </div>
                             <div class="col-6">
-                              <button class="button-nice color-2" id="button-timed-comment" onclick="openTimedCommentModal()"><i class="far fa-comment"></i> Comment</button>
+                              <button class="button-nice button-small color-2" id="button-timed-comment" onclick="openTimedCommentModal()"><i class="far fa-comment"></i> Comment</button>
                             </div>
                           </div>
                         </div>

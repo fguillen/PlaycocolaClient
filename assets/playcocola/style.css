@@ -278,12 +278,16 @@
   width: 100%;
 }
 
-#button-timed-comment {
-  font-size: 33px;
-  height: 83px;
-  width: 289px;
-  line-height: 78px;
-  text-align: center;
+.button-small {
+  font-size: 33px !important;
+  height: 83px !important;
+  width: 289px !important;
+  line-height: 78px !important;
+  text-align: center !important;
+}
+
+#download-game-link {
+  width: 415px !important;
 }
 
 #play-gathering-cover {
